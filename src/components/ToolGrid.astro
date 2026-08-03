@@ -1,0 +1,25 @@
+---
+import type { Tool } from '../data/tools';
+
+interface Props {
+	tools: Tool[];
+}
+
+const { tools } = Astro.props;
+---
+
+{tools.length === 0 ? (
+	<p class="empty-state">No tools listed yet. Add entries in <code>src/data/tools.ts</code>.</p>
+) : (
+	<ul class="tool-grid">
+		{tools.map((tool) => (
+			<li>
+				<a class="tool-card" href={tool.url} rel="noopener noreferrer">
+					<p class="tool-card__title">{tool.title}</p>
+					<p class="tool-card__desc">{tool.description}</p>
+					{tool.repo && <p class="tool-card__meta">source on GitHub</p>}
+				</a>
+			</li>
+		))}
+	</ul>
+)}

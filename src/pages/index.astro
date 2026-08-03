@@ -1,0 +1,40 @@
+---
+import Layout from '../components/Layout.astro';
+import MorphingHeroTitle from '../components/MorphingHeroTitle.astro';
+import ToolGrid from '../components/ToolGrid.astro';
+import { profile } from '../data/profile';
+import { tools } from '../data/tools';
+import { getPublishedPosts } from '../utils/blog';
+
+const posts = await getPublishedPosts();
+const showBlogNav = posts.length > 0;
+const featured = tools.filter((t) => t.featured);
+const otherTools = tools.filter((t) => !t.featured);
+---
+
+<Layout showBlogNav={showBlogNav}>
+	<section class="hero">
+		<MorphingHeroTitle />
+		<p class="tagline">{profile.tagline}</p>
+		<p class="bio">{profile.bio}</p>
+		<div class="profile-links">
+			{profile.links.map((link) => (
+				<a href={link.href} rel="noopener noreferrer">{link.label}</a>
+			))}
+		</div>
+	</section>
+
+	{featured.length > 0 && (
+		<section>
+			<h2 class="section-title">Featured</h2>
+			<ToolGrid tools={featured} />
+		</section>
+	)}
+
+	{(otherTools.length > 0 || featured.length === 0) && (
+		<section>
+			<h2 class="section-title">{featured.length > 0 ? 'More tools' : 'Tools'}</h2>
+			<ToolGrid tools={featured.length === 0 ? tools : otherTools} />
+		</section>
+	)}
+</Layout>
