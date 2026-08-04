@@ -78,13 +78,16 @@ img {
 .site-title {
 	display: inline-block;
 	min-width: calc(var(--morph-max-ch, 0) * 1ch);
-	font-family: var(--font-mono);
+	font-family: var(--font-sans);
 	font-size: 1rem;
 	font-weight: 600;
-	font-variant-numeric: tabular-nums;
 	color: var(--text);
 	text-decoration: none;
 	white-space: nowrap;
+}
+
+.site-title :where(.site-title__text, .morph-stage, .morph-char) {
+	font-family: inherit;
 }
 
 .site-title:hover {
@@ -158,10 +161,6 @@ main {
 
 .morph-char--merge-out {
 	animation: morph-merge-out 0.2s ease forwards;
-}
-
-.morph-char--digit {
-	color: var(--accent);
 }
 
 @keyframes morph-merge-in {

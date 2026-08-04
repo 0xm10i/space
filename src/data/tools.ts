@@ -14,7 +14,6 @@ export const tools: Tool[] = [
 		url: '/bass-tools/',
 		description:
 			'Ear training, chromatic tuner, metronome, and drum machine for bass — play back random notes by ear.',
-		repo: 'https://github.com/0xm10i/bass-tools',
 		featured: true,
 		tags: ['music', 'bass'],
 	},
