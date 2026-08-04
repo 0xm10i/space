@@ -7,14 +7,15 @@ export type Tool = {
 	tags?: string[];
 };
 
-/** Add one entry per GitHub Pages tool — this is the only file to edit when you ship something new. */
+/** Add one entry per tool — this is the only file to edit when you ship something new. */
 export const tools: Tool[] = [
 	{
-		title: 'Example tool',
-		url: 'https://mehdisabouri.github.io/example-tool/',
-		description: 'Replace with your first GH Pages project.',
-		repo: 'https://github.com/mehdisabouri/example-tool',
+		title: 'Bass Tools',
+		url: '/bass-tools/',
+		description:
+			'Ear training, chromatic tuner, metronome, and drum machine for bass — play back random notes by ear.',
+		repo: 'https://github.com/0xm10i/bass-tools',
 		featured: true,
-		tags: ['demo'],
+		tags: ['music', 'bass'],
 	},
 ];

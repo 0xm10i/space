@@ -41,6 +41,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 				<a class="site-title" href="/">m10i.space</a>
 				<nav class="site-nav" aria-label="Main">
 					<a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>Home</a>
+					<a
+						href="/bass-tools/"
+						aria-current={Astro.url.pathname.startsWith('/bass-tools') ? 'page' : undefined}
+					>
+						Bass Tools
+					</a>
 					{showBlogNav && (
 						<a href="/blog" aria-current={Astro.url.pathname.startsWith('/blog') ? 'page' : undefined}>
 							Blog

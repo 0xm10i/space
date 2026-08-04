@@ -1,0 +1,279 @@
+---
+import Layout from '../../components/Layout.astro';
+import '../../styles/bass-tools.css';
+import { getPublishedPosts } from '../../utils/blog';
+
+const posts = await getPublishedPosts();
+const showBlogNav = posts.length > 0;
+const description =
+	'Ear training, tuner, metronome, and drum machine for bass. Random notes play through your speakers; play them back on your instrument.';
+---
+
+<Layout title="Bass Tools" description={description} showBlogNav={showBlogNav}>
+	<div class="bass-tools">
+		<header class="bass-tools-intro">
+			<h1>Bass Tools</h1>
+			<p class="tagline">Ear training, tuner, metronome, and drum machine for bass.</p>
+		</header>
+
+		  <section id="view-home" class="view view-active">
+		    <div class="card home-card">
+		      <h2>Tools</h2>
+		      <p class="lead">Chromatic tuner, metronome, and drum machine.</p>
+		      <button type="button" id="btn-tuner" class="btn btn-secondary">Tuner</button>
+		      <button type="button" id="btn-metronome" class="btn btn-secondary">Metronome</button>
+		      <button type="button" id="btn-drum" class="btn btn-secondary">Drum machine</button>
+		    </div>
+
+		    <div class="card home-card">
+		      <h2>Note imitation practice</h2>
+		      <p class="lead">
+		        Random notes in your configured range play through your speakers; play them back on your bass in the
+		        same order. Note names stay hidden until you match each one.
+		      </p>
+		      <ul class="home-list">
+		        <li>Wrong pitch: the sequence replays after a short delay.</li>
+		        <li>Multi-note rounds may show up/down hints only while a replay is playing.</li>
+		        <li>Use headphones so the mic does not pick up the reference tones.</li>
+		      </ul>
+		      <p class="home-start-label">Notes per round</p>
+		      <div class="start-row">
+		        <button type="button" class="btn btn-primary btn-start" data-note-count="1">1 note</button>
+		        <button type="button" class="btn btn-secondary btn-start" data-note-count="2">2 notes</button>
+		        <button type="button" class="btn btn-secondary btn-start" data-note-count="3">3 notes</button>
+		      </div>
+		      <button type="button" id="btn-toggle-settings" class="btn btn-secondary">Settings</button>
+		    </div>
+
+		    <form id="settings-form" class="card settings-panel hidden" aria-label="Settings">
+		      <h2>Settings</h2>
+		      <div class="field-grid">
+		        <label>
+		          Notes per set
+		          <input type="number" name="notesPerSet" min="1" max="500" required />
+		        </label>
+		        <label>
+		          Lowest string (open)
+		          <input type="text" name="lowestNote" placeholder="B0" required />
+		        </label>
+		        <label>
+		          Highest string (open)
+		          <input type="text" name="highestNote" placeholder="G2" required />
+		        </label>
+		        <label>
+		          Frets
+		          <input type="number" name="frets" min="1" max="36" required />
+		        </label>
+		        <label>
+		          Max interval in a sequence (semitones)
+		          <input type="number" name="maxIntervalSemitones" min="1" max="24" required />
+		        </label>
+		        <label class="gate-slider">
+		          Playback volume
+		          <input type="range" name="playbackVolume" min="0" max="2" step="0.05" />
+		        </label>
+		      </div>
+
+		      <details class="advanced">
+		        <summary>Advanced</summary>
+		        <div class="field-grid">
+		          <label>
+		            Microphone
+		            <select name="inputDeviceId" id="input-device-select">
+		              <option value="">Default</option>
+		            </select>
+		          </label>
+		          <label>
+		            Noise gate
+		            <input type="number" name="noiseGate" min="0.001" max="0.2" step="0.001" />
+		          </label>
+		          <label>
+		            Mic boost
+		            <input type="number" name="inputGain" min="0.5" max="8" step="0.1" />
+		          </label>
+		          <label>
+		            Cents tolerance
+		            <input type="number" name="centsTolerance" min="5" max="100" />
+		          </label>
+		          <label class="checkbox">
+		            <input type="checkbox" name="showLiveDetection" />
+		            Show live detection (debug)
+		          </label>
+		        </div>
+		      </details>
+
+		      <button type="submit" class="btn btn-primary">Save settings</button>
+		      <p id="settings-saved" class="hint hidden" role="status">Settings saved.</p>
+		    </form>
+		  </section>
+
+		  <section id="view-practice" class="view" hidden>
+		    <div class="card practice-card">
+		      <div class="progress-row">
+		        <span id="practice-progress">0 / 100</span>
+		        <button type="button" id="btn-stop" class="btn btn-secondary btn-small">Stop</button>
+		      </div>
+		      <p id="practice-status" class="practice-status">Listening…</p>
+		      <p id="practice-sequence" class="practice-sequence hidden" aria-live="polite"></p>
+		      <p id="practice-hint" class="practice-hint hidden" aria-live="polite"></p>
+		      <p id="practice-reveal" class="practice-reveal hidden" aria-live="polite"></p>
+		      <p id="practice-live" class="practice-live hidden" aria-live="polite"></p>
+		      <div class="meter-wrap">
+		        <label class="meter-label">Mic level</label>
+		        <div class="meter">
+		          <div id="mic-meter" class="meter-fill"></div>
+		          <div id="mic-gate-mark" class="meter-gate"></div>
+		        </div>
+		        <label class="gate-slider">
+		          Trigger level
+		          <input type="range" id="mic-gate" min="0.001" max="0.04" step="0.0005" />
+		        </label>
+		        <label class="gate-slider">
+		          Mic boost
+		          <input type="range" id="mic-boost" min="0.5" max="8" step="0.1" />
+		        </label>
+		        <p class="gate-hint">Notes register when the bar passes the mark.</p>
+		        <label class="gate-slider">
+		          Playback volume
+		          <input type="range" id="playback-volume" min="0" max="2" step="0.05" />
+		        </label>
+		      </div>
+		    </div>
+		  </section>
+
+		  <section id="view-tuner" class="view" hidden>
+		    <div class="card tuner-card">
+		      <div class="progress-row">
+		        <span class="tuner-title">Chromatic tuner</span>
+		        <button type="button" id="btn-tuner-back" class="btn btn-secondary btn-small">Back</button>
+		      </div>
+		      <p id="tuner-note" class="tuner-note" aria-live="polite">—</p>
+		      <p id="tuner-cents" class="tuner-cents" aria-live="polite"></p>
+		      <p id="tuner-freq" class="tuner-freq" aria-live="polite"></p>
+		      <div class="tuner-gauge" aria-hidden="true">
+		        <div class="tuner-center"></div>
+		        <div id="tuner-needle" class="tuner-needle"></div>
+		      </div>
+		      <div class="meter-wrap">
+		        <label class="meter-label">Mic level</label>
+		        <div class="meter">
+		          <div id="tuner-meter" class="meter-fill"></div>
+		          <div id="tuner-gate-mark" class="meter-gate"></div>
+		        </div>
+		        <label class="gate-slider">
+		          Trigger level
+		          <input type="range" id="tuner-gate" min="0.001" max="0.04" step="0.0005" />
+		        </label>
+		        <label class="gate-slider">
+		          Mic boost
+		          <input type="range" id="tuner-boost" min="0.5" max="8" step="0.1" />
+		        </label>
+		        <p class="gate-hint">Notes register when the bar passes the mark.</p>
+		      </div>
+		    </div>
+		  </section>
+
+		  <section id="view-metronome" class="view" hidden>
+		    <div class="card metronome-card">
+		      <div class="progress-row">
+		        <span class="metronome-title">Metronome</span>
+		        <button type="button" id="btn-metronome-back" class="btn btn-secondary btn-small">Back</button>
+		      </div>
+		      <div class="metronome-controls">
+		        <button type="button" id="btn-metronome-play" class="btn btn-primary metronome-play">Play</button>
+		        <div class="tempo-dial-wrap">
+		          <label class="tempo-dial-label">Tempo</label>
+		          <div id="tempo-dial" class="tempo-dial" tabindex="0" role="slider" aria-label="Tempo BPM" aria-valuemin="40" aria-valuemax="240" aria-valuenow="90">
+		            <div id="tempo-dial-knob" class="tempo-dial-knob"></div>
+		            <span id="metronome-bpm" class="tempo-dial-value">90</span>
+		            <span class="tempo-dial-unit">BPM</span>
+		          </div>
+		        </div>
+		        <div class="stepper-field">
+		          <span class="stepper-label">Beats per measure</span>
+		          <div class="stepper">
+		            <button type="button" id="metronome-beats-minus" class="btn btn-secondary btn-small stepper-btn" aria-label="Decrease beats">−</button>
+		            <input type="number" id="metronome-beats" class="stepper-input" min="1" max="16" value="4" readonly aria-label="Beats per measure" />
+		            <button type="button" id="metronome-beats-plus" class="btn btn-secondary btn-small stepper-btn" aria-label="Increase beats">+</button>
+		          </div>
+		        </div>
+		        <label class="gate-slider metronome-volume">
+		          Metronome volume
+		          <input type="range" id="metronome-volume" min="0" max="2" step="0.05" />
+		        </label>
+		      </div>
+		    </div>
+		  </section>
+
+		  <section id="view-drum" class="view" hidden>
+		    <div class="card drum-card">
+		      <div class="progress-row">
+		        <span class="drum-title">Drum machine</span>
+		        <button type="button" id="btn-drum-back" class="btn btn-secondary btn-small">Back</button>
+		      </div>
+		      <div class="drum-controls">
+		        <div class="drum-transport">
+		          <button type="button" id="btn-drum-play" class="btn btn-primary drum-play">Play</button>
+		          <button type="button" id="btn-drum-reset" class="btn btn-secondary">Reset</button>
+		        </div>
+		        <label class="gate-slider drum-tempo">
+		          Tempo
+		          <input type="range" id="drum-tempo" min="40" max="240" step="1" value="90" />
+		          <span id="drum-bpm" class="drum-bpm-readout">90 BPM</span>
+		        </label>
+		        <div class="drum-volumes" role="group" aria-label="Drum volumes">
+		          <label class="gate-slider drum-vol-slider">
+		            <span class="drum-vol-mark">M</span>
+		            <input type="range" id="drum-vol-master" min="0" max="2" step="0.05" value="1" aria-label="Master volume" />
+		          </label>
+		          <label class="gate-slider drum-vol-slider">
+		            <span class="drum-vol-mark">K</span>
+		            <input type="range" id="drum-vol-kick" min="0" max="2" step="0.05" value="1" aria-label="Kick volume" />
+		          </label>
+		          <label class="gate-slider drum-vol-slider">
+		            <span class="drum-vol-mark">S</span>
+		            <input type="range" id="drum-vol-snare" min="0" max="2" step="0.05" value="1" aria-label="Snare volume" />
+		          </label>
+		          <label class="gate-slider drum-vol-slider">
+		            <span class="drum-vol-mark">H</span>
+		            <input type="range" id="drum-vol-hihat" min="0" max="2" step="0.05" value="1" aria-label="Hi-hat volume" />
+		          </label>
+		        </div>
+		        <div class="drum-steppers">
+		          <div class="stepper-field">
+		            <span class="stepper-label">Beats</span>
+		            <div class="stepper">
+		              <button type="button" id="drum-beats-minus" class="btn btn-secondary btn-small stepper-btn" aria-label="Decrease beats">−</button>
+		              <input type="number" id="drum-beats" class="stepper-input" min="1" max="16" value="4" readonly aria-label="Beats" />
+		              <button type="button" id="drum-beats-plus" class="btn btn-secondary btn-small stepper-btn" aria-label="Increase beats">+</button>
+		            </div>
+		          </div>
+		          <div class="stepper-field">
+		            <span class="stepper-label">Sub-beats per beat</span>
+		            <div class="stepper">
+		              <button type="button" id="drum-subbeats-minus" class="btn btn-secondary btn-small stepper-btn" aria-label="Decrease sub-beats">−</button>
+		              <input type="number" id="drum-subbeats" class="stepper-input" min="1" max="16" value="4" readonly aria-label="Sub-beats per beat" />
+		              <button type="button" id="drum-subbeats-plus" class="btn btn-secondary btn-small stepper-btn" aria-label="Increase sub-beats">+</button>
+		            </div>
+		          </div>
+		        </div>
+		        <div id="drum-grid" class="drum-grid" aria-label="Step sequencer pattern"></div>
+		      </div>
+		    </div>
+		  </section>
+
+		  <section id="view-results" class="view" hidden>
+		    <div class="card">
+		      <h2>Session complete</h2>
+		      <dl class="stats-grid" id="results-summary"></dl>
+		      <h3>Hardest notes</h3>
+		      <ul id="results-per-note" class="per-note-list"></ul>
+		      <button type="button" id="btn-home" class="btn btn-primary">Back home</button>
+		    </div>
+		  </section>
+	</div>
+</Layout>
+
+<script>
+	import '../../scripts/bass-tools/app.js';
+</script>
