@@ -1,0 +1,76 @@
+---
+import Layout from '../../components/Layout.astro';
+import '../../styles/talk-back.css';
+import { getPublishedPosts } from '../../utils/blog';
+
+const posts = await getPublishedPosts();
+const showBlogNav = posts.length > 0;
+const description =
+	'Speaking drills — record yourself, watch instant playback, and see a live transcript with a words-per-minute readout.';
+---
+
+<Layout title="Talk Back" description={description} showBlogNav={showBlogNav}>
+	<div class="talk-back">
+		<header class="talk-back-intro">
+			<h1>Talk Back</h1>
+			<p class="tagline">Speaking drills — record, watch, improve.</p>
+		</header>
+
+		<div class="lang-selector">
+			<span class="lang-label">Language</span>
+			<div class="lang-group">
+				<button type="button" class="lang-btn" data-lang="en-US">🇺🇸 EN</button>
+				<button type="button" class="lang-btn" data-lang="fr-FR">🇫🇷 FR</button>
+			</div>
+		</div>
+
+		<div class="video-area">
+			<div class="video-wrapper" id="preview-wrapper">
+				<video id="preview" autoplay muted playsinline></video>
+				<span class="video-label">PREVIEW</span>
+				<div class="rec-badge" id="rec-badge">● REC</div>
+			</div>
+
+			<div class="video-wrapper hidden" id="playback-wrapper">
+				<video id="playback" playsinline></video>
+				<span class="video-label">PLAYBACK</span>
+			</div>
+		</div>
+
+		<div class="controls">
+			<button type="button" id="btn-record" class="btn btn-record" disabled>
+				<span class="btn-icon">⏺</span> Record
+			</button>
+			<button type="button" id="btn-stop-rec" class="btn btn-stop-rec hidden">
+				<span class="btn-icon">⏹</span> Stop Recording
+			</button>
+			<button type="button" id="btn-ptt" class="btn btn-ptt" disabled>
+				<span class="btn-icon">🎙</span> Hold to Record
+			</button>
+			<button type="button" id="btn-stop-play" class="btn btn-stop-play hidden">
+				<span class="btn-icon">⏹</span> Stop Playback
+			</button>
+		</div>
+
+		<p class="status" id="status">Requesting camera &amp; microphone access…</p>
+		<p class="hint" id="hint"></p>
+
+		<div class="transcript-panel" id="transcript-panel">
+			<div class="transcript-header">
+				<span class="transcript-title">Live Transcript</span>
+				<span class="wpm-display" id="wpm-display"></span>
+				<span class="speech-indicator" id="speech-indicator"></span>
+			</div>
+			<div class="transcript-body">
+				<p class="transcript-placeholder" id="transcript-placeholder">
+					Start recording to see your live transcript here.
+				</p>
+				<p class="transcript-text" id="transcript-text"></p>
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<script>
+	import '../../scripts/talk-back/app.js';
+</script>

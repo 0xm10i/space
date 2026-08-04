@@ -48,6 +48,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 					>
 						Bass Tools
 					</a>
+					<a
+						href="/talk-back/"
+						aria-current={Astro.url.pathname.startsWith('/talk-back') ? 'page' : undefined}
+					>
+						Talk Back
+					</a>
 					{showBlogNav && (
 						<a href="/blog" aria-current={Astro.url.pathname.startsWith('/blog') ? 'page' : undefined}>
 							Blog

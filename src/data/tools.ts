@@ -17,4 +17,12 @@ export const tools: Tool[] = [
 		featured: true,
 		tags: ['music', 'bass'],
 	},
+	{
+		title: 'Talk Back',
+		url: '/talk-back/',
+		description:
+			'Speaking drills — record yourself on camera, get instant playback, and see a live transcript with a words-per-minute readout.',
+		featured: true,
+		tags: ['speech', 'practice'],
+	},
 ];
