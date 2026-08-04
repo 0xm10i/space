@@ -1,6 +1,5 @@
 ---
 import Layout from '../components/Layout.astro';
-import MorphingHeroTitle from '../components/MorphingHeroTitle.astro';
 import ToolGrid from '../components/ToolGrid.astro';
 import { profile } from '../data/profile';
 import { tools } from '../data/tools';
@@ -14,7 +13,6 @@ const otherTools = tools.filter((t) => !t.featured);
 
 <Layout showBlogNav={showBlogNav}>
 	<section class="hero">
-		<MorphingHeroTitle />
 		<p class="tagline">{profile.tagline}</p>
 		<p class="bio">{profile.bio}</p>
 		<div class="profile-links">

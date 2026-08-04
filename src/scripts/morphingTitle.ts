@@ -121,8 +121,8 @@ function runLoop(root: HTMLElement) {
 	};
 }
 
-export function initMorphingHeroTitle() {
-	const root = document.querySelector<HTMLElement>('[data-morphing-hero-title]');
+export function initMorphingTitle() {
+	const root = document.querySelector<HTMLElement>('[data-morphing-title]');
 	if (!root) return;
 
 	if (root.closest('[data-morph-off]')) {

@@ -1,0 +1,19 @@
+---
+import { EXPANDED_TITLE, morphKeyframes } from '../data/titleMorph';
+
+const maxLength = Math.max(...morphKeyframes.map((k) => k.length));
+---
+
+<a class="site-title" href="/" aria-label={EXPANDED_TITLE} style={`--morph-max-ch: ${maxLength}`}>
+	<span data-morphing-title class="site-title__text">{EXPANDED_TITLE}</span>
+</a>
+
+<script>
+	import { initMorphingTitle } from '../scripts/morphingTitle';
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', () => initMorphingTitle(), { once: true });
+	} else {
+		initMorphingTitle();
+	}
+</script>

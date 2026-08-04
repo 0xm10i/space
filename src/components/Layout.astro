@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import MorphingSiteTitle from './MorphingSiteTitle.astro';
 import { profile } from '../data/profile';
 
 interface Props {
@@ -38,7 +39,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 	<body>
 		<header class="site-header">
 			<div class="site-header__inner">
-				<a class="site-title" href="/">m10i.space</a>
+				<MorphingSiteTitle />
 				<nav class="site-nav" aria-label="Main">
 					<a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>Home</a>
 					<a
