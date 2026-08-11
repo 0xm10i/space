@@ -8,12 +8,14 @@ export function createMetronome(options, callbacks = {}) {
 
   let bpm = options.bpm ?? 90;
   let beatsPerMeasure = options.beatsPerMeasure ?? 4;
+  let beatsPerMeasureEnabled = options.beatsPerMeasureEnabled ?? true;
   let schedulerId = null;
   let nextBeatTime = 0;
   let beatIndex = 0;
   let running = false;
 
   function isAccent() {
+    if (!beatsPerMeasureEnabled) return false;
     return beatIndex % beatsPerMeasure === 0;
   }
 
@@ -43,11 +45,15 @@ export function createMetronome(options, callbacks = {}) {
     },
 
     setBpm(value) {
-      bpm = Math.min(240, Math.max(40, value));
+      bpm = Math.min(240, Math.max(20, value));
     },
 
     setBeatsPerMeasure(value) {
       beatsPerMeasure = Math.min(16, Math.max(1, value));
+    },
+
+    setBeatsPerMeasureEnabled(enabled) {
+      beatsPerMeasureEnabled = Boolean(enabled);
     },
 
     async start() {

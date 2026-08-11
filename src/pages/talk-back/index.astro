@@ -1,19 +1,16 @@
 ---
 import Layout from '../../components/Layout.astro';
 import '../../styles/talk-back.css';
-import { getPublishedPosts } from '../../utils/blog';
 
-const posts = await getPublishedPosts();
-const showBlogNav = posts.length > 0;
 const description =
 	'Speaking drills — record yourself, watch instant playback, and see a live transcript with a words-per-minute readout.';
 ---
 
-<Layout title="Talk Back" description={description} showBlogNav={showBlogNav}>
+<Layout title="Talk Back" description={description}>
 	<div class="talk-back">
-		<header class="talk-back-intro">
+		<header class="page-intro">
 			<h1>Talk Back</h1>
-			<p class="tagline">Speaking drills — record, watch, improve.</p>
+			<p class="page-intro__desc">Speaking drills — record, watch, improve.</p>
 		</header>
 
 		<div class="lang-selector">
@@ -38,16 +35,16 @@ const description =
 		</div>
 
 		<div class="controls">
-			<button type="button" id="btn-record" class="btn btn-record" disabled>
+			<button type="button" id="btn-record" class="btn btn-primary" disabled>
 				<span class="btn-icon">⏺</span> Record
 			</button>
-			<button type="button" id="btn-stop-rec" class="btn btn-stop-rec hidden">
+			<button type="button" id="btn-stop-rec" class="btn btn-primary hidden">
 				<span class="btn-icon">⏹</span> Stop Recording
 			</button>
-			<button type="button" id="btn-ptt" class="btn btn-ptt" disabled>
+			<button type="button" id="btn-ptt" class="btn btn-secondary btn-ptt" disabled>
 				<span class="btn-icon">🎙</span> Hold to Record
 			</button>
-			<button type="button" id="btn-stop-play" class="btn btn-stop-play hidden">
+			<button type="button" id="btn-stop-play" class="btn btn-primary hidden">
 				<span class="btn-icon">⏹</span> Stop Playback
 			</button>
 		</div>

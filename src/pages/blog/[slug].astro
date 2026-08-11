@@ -12,10 +12,9 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await post.render();
-const showBlogNav = true;
 ---
 
-<Layout title={post.data.title} description={post.data.description} showBlogNav={showBlogNav}>
+<Layout title={post.data.title} description={post.data.description}>
 	<article class="prose">
 		<h1>{post.data.title}</h1>
 		<p>

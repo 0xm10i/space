@@ -1,52 +1,21 @@
 .talk-back {
-  --surface: var(--bg-elevated);
-  --muted: var(--text-muted);
-  --tb-border: var(--border);
-  --tb-accent: var(--accent);
-  --tb-accent-2: var(--accent-hover);
-  --radius: 12px;
-  --shadow: 0 8px 32px color-mix(in srgb, var(--text) 12%, transparent);
-  font-family: var(--font-sans);
-  color: var(--text);
-  line-height: 1.5;
-  max-width: 640px;
-  margin: 0 auto;
+  --success: #2d8a5c;
+  --inset: color-mix(in srgb, var(--border) 35%, var(--bg));
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.75rem;
 }
 
-.talk-back * {
-  box-sizing: border-box;
-}
-
-.talk-back button {
-  font-family: inherit;
-}
-
-.talk-back-intro {
-  text-align: center;
-}
-
-.talk-back-intro h1 {
-  margin: 0 0 0.35rem;
-  font-size: 1.75rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--text);
-}
-
-.talk-back .tagline {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--muted);
-  letter-spacing: 0.02em;
+.talk-back .page-intro,
+.talk-back .lang-selector {
+  align-self: stretch;
 }
 
 .talk-back .video-area {
   display: flex;
-  gap: 24px;
+  gap: 1.25rem;
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
@@ -54,14 +23,13 @@
 
 .talk-back .video-wrapper {
   position: relative;
-  width: 640px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 36rem;
   aspect-ratio: 16 / 9;
   background: #000;
   border-radius: var(--radius);
   overflow: hidden;
-  border: 1px solid var(--tb-border);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   transition: opacity 0.25s, transform 0.25s;
 }
 
@@ -74,15 +42,16 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transform: scaleX(-1);
 }
 
 .talk-back .video-label {
   position: absolute;
-  bottom: 10px;
-  left: 14px;
+  bottom: 0.625rem;
+  left: 0.875rem;
   font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
   pointer-events: none;
@@ -90,12 +59,12 @@
 
 .talk-back .rec-badge {
   position: absolute;
-  top: 12px;
-  right: 14px;
+  top: 0.75rem;
+  right: 0.875rem;
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--tb-accent);
+  letter-spacing: 0.08em;
+  color: var(--accent);
   opacity: 0;
   transition: opacity 0.2s;
   pointer-events: none;
@@ -114,78 +83,29 @@
 
 .talk-back .controls {
   display: flex;
-  gap: 14px;
+  gap: 0.875rem;
   flex-wrap: wrap;
   justify-content: center;
 }
 
-.talk-back .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 28px;
-  border-radius: 50px;
-  border: none;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s, opacity 0.15s, border-color 0.15s;
-  letter-spacing: 0.3px;
-}
-
-.talk-back .btn:active {
-  transform: scale(0.96);
-}
-
-.talk-back .btn:disabled {
-  opacity: 0.38;
-  cursor: not-allowed;
-}
-
-.talk-back .btn-record {
-  background: var(--tb-accent);
-  color: #fff;
-}
-
-.talk-back .btn-record:not(:disabled):hover {
-  background: var(--tb-accent-2);
-}
-
-.talk-back .btn-stop-rec {
-  background: color-mix(in srgb, var(--tb-accent) 75%, #000);
-  color: #fff;
-}
-
-.talk-back .btn-stop-rec:hover {
-  background: var(--tb-accent);
-}
-
-.talk-back .btn-stop-play {
-  background: var(--tb-accent-2);
-  color: #fff;
-}
-
-.talk-back .btn-stop-play:hover {
-  filter: brightness(1.08);
+.talk-back .controls .btn {
+  margin: 0;
 }
 
 .talk-back .btn-ptt {
-  background: color-mix(in srgb, var(--tb-border) 35%, var(--bg));
-  color: var(--text);
-  border: 2px solid var(--tb-border);
   user-select: none;
   -webkit-user-select: none;
 }
 
 .talk-back .btn-ptt:not(:disabled):hover {
-  background: var(--surface);
-  border-color: color-mix(in srgb, var(--tb-border) 60%, var(--text));
+  background: var(--bg-elevated);
+  border-color: color-mix(in srgb, var(--border) 60%, var(--text));
 }
 
 .talk-back .btn-ptt--active,
 .talk-back .btn-ptt--active:hover {
-  background: var(--tb-accent) !important;
-  border-color: var(--tb-accent) !important;
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
   color: #fff;
 }
 
@@ -194,23 +114,17 @@
   line-height: 1;
 }
 
-.talk-back .hidden {
-  display: none !important;
-}
-
 .talk-back .status {
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--text-muted);
   min-height: 1.2em;
-  letter-spacing: 0.2px;
   text-align: center;
   margin: 0;
 }
 
 .talk-back .hint {
   font-size: 0.75rem;
-  color: var(--muted);
-  letter-spacing: 0.2px;
+  color: var(--text-muted);
   text-align: center;
   min-height: 1em;
   margin: 0;
@@ -220,54 +134,53 @@
 .talk-back .lang-selector {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .talk-back .lang-label {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--text-muted);
 }
 
 .talk-back .lang-group {
   display: flex;
-  background: var(--surface);
-  border: 1px solid var(--tb-border);
-  border-radius: 50px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 3px;
   gap: 2px;
 }
 
 .talk-back .lang-btn {
-  padding: 6px 16px;
-  border-radius: 50px;
+  padding: 0.35rem 1rem;
+  border-radius: 4px;
   border: none;
   background: transparent;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
-  letter-spacing: 0.3px;
 }
 
 .talk-back .lang-btn:hover {
-  background: color-mix(in srgb, var(--tb-border) 40%, var(--bg));
+  background: var(--inset);
   color: var(--text);
 }
 
 .talk-back .lang-btn--active {
-  background: var(--tb-accent-2);
+  background: var(--accent-hover);
   color: #fff;
 }
 
 .talk-back .transcript-panel {
-  width: 640px;
-  max-width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--tb-border);
+  width: 100%;
+  max-width: 36rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -275,29 +188,30 @@
 .talk-back .transcript-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--tb-border);
+  gap: 0.625rem;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--border);
 }
 
 .talk-back .transcript-title {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 1.2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--text-muted);
   flex: 1;
 }
 
 .talk-back .wpm-display {
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
   letter-spacing: 0.08em;
-  color: var(--muted);
+  color: var(--text-muted);
   background: var(--bg);
-  border: 1px solid var(--tb-border);
-  border-radius: 50px;
-  padding: 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.125rem 0.625rem;
   min-width: 4.5em;
   text-align: center;
   transition: color 0.3s, border-color 0.3s;
@@ -306,15 +220,15 @@
 
 .talk-back .wpm-display.active {
   visibility: visible;
-  color: #2d8a5c;
-  border-color: color-mix(in srgb, #2d8a5c 40%, var(--tb-border));
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 40%, var(--border));
 }
 
 .talk-back .speech-indicator {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  color: #2d8a5c;
+  letter-spacing: 0.08em;
+  color: var(--success);
   min-width: 1em;
 }
 
@@ -324,7 +238,7 @@
 }
 
 .talk-back .speech-indicator.unsupported {
-  color: var(--muted);
+  color: var(--text-muted);
 }
 
 .talk-back .speech-indicator.unsupported::before {
@@ -334,17 +248,16 @@
 }
 
 .talk-back .transcript-body {
-  padding: 16px;
+  padding: 1rem 1.15rem;
   min-height: 80px;
   max-height: 180px;
   overflow-y: auto;
 }
 
 .talk-back .transcript-placeholder {
-  color: var(--muted);
-  font-size: 0.88rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
   font-style: italic;
-  line-height: 1.55;
   margin: 0;
 }
 
@@ -361,17 +274,13 @@
 }
 
 .talk-back .transcript-text .interim {
-  color: var(--muted);
+  color: var(--text-muted);
   font-style: italic;
 }
 
-@media (max-width: 700px) {
-  .talk-back-intro h1 {
-    font-size: 1.5rem;
-  }
-
-  .talk-back .video-wrapper,
-  .talk-back .transcript-panel {
-    width: 100%;
+@media (prefers-reduced-motion: reduce) {
+  .talk-back .rec-badge.active,
+  .talk-back .speech-indicator.active::before {
+    animation: none;
   }
 }

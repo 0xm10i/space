@@ -1,0 +1,136 @@
+---
+import Layout from '../../components/Layout.astro';
+import '../../styles/bass-tools.css';
+
+const description =
+	'Note imitation practice for bass. Random notes play through your speakers; play them back on your instrument by ear.';
+---
+
+<Layout title="Ear Training for Bass" description={description}>
+	<section id="view-home" class="view view-active">
+		<header class="page-intro">
+			<h1>Ear Training for Bass</h1>
+			<p class="page-intro__desc">
+				Random notes in your configured range play through your speakers; play them back on your bass in the
+				same order. Note names stay hidden until you match each one. Use headphones so the mic does not pick up
+				the reference tones.
+			</p>
+			<p class="home-start-label">Notes per round</p>
+			<div class="home-actions start-row">
+				<button type="button" class="btn btn-primary btn-start" data-note-count="1">1 note</button>
+				<button type="button" class="btn btn-secondary btn-start" data-note-count="2">2 notes</button>
+				<button type="button" class="btn btn-secondary btn-start" data-note-count="3">3 notes</button>
+				<button type="button" id="btn-toggle-settings" class="btn btn-secondary">Settings</button>
+			</div>
+		</header>
+
+		<form id="settings-form" class="card settings-panel hidden" aria-label="Settings">
+			<h2>Settings</h2>
+			<div class="field-grid">
+				<label>
+					Notes per set
+					<input type="number" name="notesPerSet" min="1" max="500" required />
+				</label>
+				<label>
+					Lowest string (open)
+					<input type="text" name="lowestNote" placeholder="B0" required />
+				</label>
+				<label>
+					Highest string (open)
+					<input type="text" name="highestNote" placeholder="G2" required />
+				</label>
+				<label>
+					Frets
+					<input type="number" name="frets" min="1" max="36" required />
+				</label>
+				<label>
+					Max interval in a sequence (semitones)
+					<input type="number" name="maxIntervalSemitones" min="1" max="24" required />
+				</label>
+				<label class="gate-slider">
+					Playback volume
+					<input type="range" name="playbackVolume" min="0" max="2" step="0.05" />
+				</label>
+			</div>
+
+			<details class="advanced">
+				<summary>Advanced</summary>
+				<div class="field-grid">
+					<label>
+						Microphone
+						<select name="inputDeviceId" id="input-device-select">
+							<option value="">Default</option>
+						</select>
+					</label>
+					<label>
+						Noise gate
+						<input type="number" name="noiseGate" min="0.001" max="0.2" step="0.001" />
+					</label>
+					<label>
+						Mic boost
+						<input type="number" name="inputGain" min="0.5" max="8" step="0.1" />
+					</label>
+					<label>
+						Cents tolerance
+						<input type="number" name="centsTolerance" min="5" max="100" />
+					</label>
+					<label class="checkbox">
+						<input type="checkbox" name="showLiveDetection" />
+						Show live detection (debug)
+					</label>
+				</div>
+			</details>
+
+			<button type="submit" class="btn btn-primary">Save settings</button>
+			<p id="settings-saved" class="hint hidden" role="status">Settings saved.</p>
+		</form>
+	</section>
+
+	<section id="view-practice" class="view" hidden>
+		<div class="card practice-card">
+			<div class="progress-row">
+				<span id="practice-progress">0 / 100</span>
+				<button type="button" id="btn-stop" class="btn btn-secondary btn-small">Stop</button>
+			</div>
+			<p id="practice-status" class="practice-status">Listening…</p>
+			<p id="practice-sequence" class="practice-sequence hidden" aria-live="polite"></p>
+			<p id="practice-hint" class="practice-hint hidden" aria-live="polite"></p>
+			<p id="practice-reveal" class="practice-reveal hidden" aria-live="polite"></p>
+			<p id="practice-live" class="practice-live hidden" aria-live="polite"></p>
+			<div class="meter-wrap">
+				<label class="meter-label">Mic level</label>
+				<div class="meter">
+					<div id="mic-meter" class="meter-fill"></div>
+					<div id="mic-gate-mark" class="meter-gate"></div>
+				</div>
+				<label class="gate-slider">
+					Trigger level
+					<input type="range" id="mic-gate" min="0.001" max="0.04" step="0.0005" />
+				</label>
+				<label class="gate-slider">
+					Mic boost
+					<input type="range" id="mic-boost" min="0.5" max="8" step="0.1" />
+				</label>
+				<p class="gate-hint">Notes register when the bar passes the mark.</p>
+				<label class="gate-slider">
+					Playback volume
+					<input type="range" id="playback-volume" min="0" max="2" step="0.05" />
+				</label>
+			</div>
+		</div>
+	</section>
+
+	<section id="view-results" class="view" hidden>
+		<div class="card">
+			<h2>Session complete</h2>
+			<dl class="stats-grid" id="results-summary"></dl>
+			<h3>Hardest notes</h3>
+			<ul id="results-per-note" class="per-note-list"></ul>
+			<button type="button" id="btn-home" class="btn btn-primary">Back home</button>
+		</div>
+	</section>
+</Layout>
+
+<script>
+	import '../../scripts/bass-tools/ear-training-app.js';
+</script>

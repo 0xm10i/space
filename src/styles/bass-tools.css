@@ -1,584 +1,640 @@
-.bass-tools {
-  --surface: var(--bg-elevated);
-  --muted: var(--text-muted);
-  --accent-dim: var(--accent-hover);
-  --success: #2d8a5c;
-  --danger: #c44;
-  --radius: 6px;
-  --inset: color-mix(in srgb, var(--border) 35%, var(--bg));
-  font-family: var(--font-sans);
-  color: var(--text);
-  line-height: 1.5;
-  max-width: 640px;
-  margin: 0 auto;
+main {
+	--success: #2d8a5c;
+	--danger: #c44;
+	--inset: color-mix(in srgb, var(--border) 35%, var(--bg));
 }
 
-.bass-tools * {
-  box-sizing: border-box;
-}
-.bass-tools button, .bass-tools input, .bass-tools select, .bass-tools textarea {
-  font-family: inherit;
-}
-.bass-tools .bass-tools-intro h1 {
-  margin: 0 0 0.35rem;
-  font-size: 1.75rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-.bass-tools .tagline {
-  margin: 0 0 1rem;
-  color: var(--muted);
-}
-.bass-tools .view {
-  display: none;
-}
-.bass-tools .view-active {
-  display: block;
-}
-.bass-tools .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem 1.25rem 1.5rem;
-  margin-bottom: 1rem;
-}
-.bass-tools .lead {
-  margin-top: 0;
-  color: var(--muted);
-}
-.bass-tools .home-card h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1.15rem;
-}
-.bass-tools .home-list {
-  margin: 0 0 1rem;
-  padding-left: 1.25rem;
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-.bass-tools .home-list li {
-  margin-bottom: 0.35rem;
-}
-.bass-tools .home-start-label {
-  margin: 0 0 0.35rem;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-.bass-tools .start-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-.bass-tools .start-row .btn {
-  margin-top: 0;
-  margin-right: 0;
-}
-.bass-tools .btn {
-  display: inline-block;
-  border: none;
-  border-radius: 8px;
-  padding: 0.65rem 1.1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-right: 0.5rem;
-  margin-top: 0.5rem;
-}
-.bass-tools .btn-primary {
-  background: var(--accent);
-  color: #fff;
-  font-weight: 600;
-}
-.bass-tools .btn-primary:hover {
-  background: var(--accent-hover);
-}
-.bass-tools .btn-secondary {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-.bass-tools .btn-small {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.875rem;
-}
-.bass-tools .hidden {
-  display: none !important;
-}
-.bass-tools .settings-panel h2 {
-  margin-top: 0;
-}
-.bass-tools .field-grid {
-  display: grid;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-.bass-tools label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-.bass-tools input, .bass-tools select {
-  padding: 0.5rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--inset);
-  color: var(--text);
-  font-size: 1rem;
-}
-.bass-tools label.checkbox {
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-}
-.bass-tools .advanced {
-  margin-bottom: 1rem;
-  color: var(--muted);
-}
-.bass-tools .hint {
-  color: var(--success);
-  font-size: 0.9rem;
-}
-.bass-tools .progress-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-}
-.bass-tools .practice-status {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0.5rem 0;
-}
-.bass-tools .practice-hint {
-  font-size: 2.5rem;
-  line-height: 1;
-  margin: 0.25rem 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
-}
-.bass-tools .practice-hint .hint-slot {
-  min-width: 1.25em;
-  text-align: center;
-}
-.bass-tools .practice-hint .hint-slot:not(.hint-correct) {
-  color: var(--danger);
-}
-.bass-tools .practice-hint .hint-correct {
-  color: var(--success);
-}
-.bass-tools .practice-sequence {
-  color: var(--muted);
-  font-size: 0.95rem;
-  margin: 0 0 0.25rem;
-}
-.bass-tools .practice-reveal {
-  font-size: 2rem;
-  color: var(--success);
-  margin: 0.25rem 0 1rem;
-}
-.bass-tools .practice-live {
-  font-family: var(--font-mono);
-  color: var(--muted);
-  margin: 0 0 1rem;
-}
-.bass-tools .meter-wrap {
-  margin-top: 1rem;
-}
-.bass-tools .meter-label {
-  font-size: 0.85rem;
-  margin-bottom: 0.35rem;
-}
-.bass-tools .meter {
-  position: relative;
-  height: 10px;
-  background: var(--inset);
-  border-radius: 999px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-.bass-tools .meter-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--accent-dim), var(--accent));
-  transition: width 80ms linear;
-}
-.bass-tools .meter-fill.above-gate {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--success) 70%, var(--bg)), var(--success));
-}
-.bass-tools .meter-gate {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  margin-left: -1px;
-  background: var(--text);
-  opacity: 0.85;
-  pointer-events: none;
-  z-index: 1;
-}
-.bass-tools .gate-slider {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 0.65rem;
-  font-size: 0.85rem;
-}
-.bass-tools .gate-slider input[type='range'] {
-  flex: 1;
-  min-width: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  accent-color: var(--accent);
-}
-.bass-tools .gate-hint {
-  margin: 0.35rem 0 0;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-.bass-tools .stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem 1rem;
-  margin: 0 0 1.5rem;
-}
-.bass-tools .stats-grid dt {
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-.bass-tools .stats-grid dd {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-.bass-tools .per-note-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem;
-}
-.bass-tools .per-note-list li {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.95rem;
-}
-.bass-tools .per-note-list .wrong {
-  color: var(--danger);
-}
-.bass-tools .tuner-title {
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-.bass-tools .tuner-note {
-  font-size: 2.75rem;
-  font-weight: 600;
-  text-align: center;
-  margin: 0.5rem 0 0.25rem;
-  letter-spacing: 0.02em;
-}
-.bass-tools .tuner-card.in-tune .tuner-note {
-  color: var(--success);
-}
-.bass-tools .tuner-cents {
-  text-align: center;
-  font-size: 1.25rem;
-  margin: 0 0 0.25rem;
-  min-height: 1.5rem;
-}
-.bass-tools .tuner-freq {
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-align: center;
-  margin: 0 0 1.25rem;
-  min-height: 1.25rem;
-}
-.bass-tools .tuner-gauge {
-  position: relative;
-  height: 12px;
-  margin: 0 0 1.25rem;
-  background: var(--inset);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.bass-tools .tuner-center {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  margin-left: -1px;
-  background: var(--muted);
-  opacity: 0.6;
-}
-.bass-tools .tuner-needle {
-  position: absolute;
-  top: 1px;
-  bottom: 1px;
-  width: 4px;
-  margin-left: -2px;
-  left: 50%;
-  border-radius: 2px;
-  background: var(--accent);
-  transition: left 60ms linear;
-}
-.bass-tools .tuner-card.in-tune .tuner-needle {
-  background: var(--success);
-}
-.bass-tools .metronome-title {
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-.bass-tools .metronome-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  margin-top: 0.5rem;
-}
-.bass-tools .metronome-play {
-  min-width: 8rem;
-  margin: 0;
-}
-.bass-tools .tempo-dial-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-}
-.bass-tools .tempo-dial-label {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-.bass-tools .tempo-dial {
-  position: relative;
-  width: 10rem;
-  height: 10rem;
-  border-radius: 50%;
-  border: 3px solid var(--border);
-  background: radial-gradient(
-    circle at 35% 30%,
-    color-mix(in srgb, var(--border) 50%, var(--surface)) 0%,
-    var(--surface) 65%
-  );
-  touch-action: none;
-  cursor: grab;
-  user-select: none;
-}
-.bass-tools .tempo-dial:active {
-  cursor: grabbing;
-}
-.bass-tools .tempo-dial:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-.bass-tools .tempo-dial-knob {
-  position: absolute;
-  top: 0.65rem;
-  left: 50%;
-  width: 4px;
-  height: 1.35rem;
-  margin-left: -2px;
-  border-radius: 2px;
-  background: var(--accent);
-  transform-origin: 50% calc(5rem - 0.65rem);
-  transform: rotate(0deg);
-  pointer-events: none;
-}
-.bass-tools .metronome-card.beat-pulse .tempo-dial {
-  border-color: var(--accent-dim);
-}
-.bass-tools .tempo-dial-value {
-  position: absolute;
-  top: 42%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  pointer-events: none;
-}
-.bass-tools .tempo-dial-unit {
-  position: absolute;
-  top: 58%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.75rem;
-  color: var(--muted);
-  pointer-events: none;
-}
-.bass-tools .stepper-field {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-}
-.bass-tools .stepper-label {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-.bass-tools .stepper {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-.bass-tools .stepper-btn {
-  margin: 0;
-  min-width: 2.25rem;
-  padding: 0.35rem 0.5rem;
-}
-.bass-tools .stepper-input {
-  width: 3rem;
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 600;
-  padding: 0.35rem 0.25rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
-  color: var(--text);
-  -moz-appearance: textfield;
-}
-.bass-tools .stepper-input::-webkit-outer-spin-button, .bass-tools .stepper-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.bass-tools .stepper-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-.bass-tools .metronome-volume {
-  width: 100%;
-  max-width: 18rem;
-}
-.bass-tools .drum-title {
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-.bass-tools .drum-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  margin-top: 0.5rem;
-}
-.bass-tools .drum-transport {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
-}
-.bass-tools .drum-play {
-  min-width: 8rem;
-  margin: 0;
-}
-.bass-tools .drum-tempo {
-  width: 100%;
-  max-width: 20rem;
-  margin: 0 auto;
-}
-.bass-tools .drum-volumes {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
-  width: 100%;
-  max-width: 22rem;
-  margin: 0 auto;
-}
-.bass-tools .drum-vol-slider {
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin: 0;
-  gap: 0.35rem;
-}
-.bass-tools .drum-vol-mark {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: 0.02em;
-}
-.bass-tools .drum-vol-slider input[type='range'] {
-  width: 100%;
-}
-.bass-tools .drum-bpm-readout {
-  display: block;
-  text-align: center;
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-top: 0.35rem;
-}
-.bass-tools .drum-steppers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 1.5rem;
-  justify-content: center;
-  width: 100%;
-}
-.bass-tools .drum-grid {
-  width: 100%;
-  margin-top: 0.25rem;
-}
-.bass-tools .drum-grid-scroll {
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
-}
-.bass-tools .drum-grid-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  min-width: min-content;
-}
-.bass-tools .drum-row {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-.bass-tools .drum-row-label {
-  flex: 0 0 2rem;
-  font-size: 0.75rem;
-  color: var(--muted);
-  text-align: right;
-  padding-right: 0.25rem;
-  line-height: 1.2;
-}
-.bass-tools .drum-steps {
-  display: flex;
-  gap: 0.2rem;
-}
-.bass-tools .drum-step {
-  flex: 0 0 1.35rem;
-  width: 1.35rem;
-  height: 1.35rem;
-  margin: 0;
-  padding: 0;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  cursor: pointer;
-}
-.bass-tools .drum-step:hover {
-  border-color: var(--accent-dim);
-}
-.bass-tools .drum-step-on {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-.bass-tools .drum-step-current {
-  box-shadow: 0 0 0 2px var(--text);
-}
-.bass-tools .drum-step-on.drum-step-current {
-  box-shadow: 0 0 0 2px var(--text), inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-}
-.bass-tools .drum-step.drum-beat-mark {
-  border-color: color-mix(in srgb, var(--border) 70%, var(--accent) 30%);
+main * {
+	box-sizing: border-box;
+}
+
+main .view {
+	display: none;
+}
+
+main .view-active {
+	display: block;
+}
+
+main .card {
+	margin-bottom: 1rem;
+}
+
+main .card :where(h2, h3) {
+	font-weight: 600;
+	margin: 0 0 0.25rem;
+}
+
+main .settings-panel h2 {
+	margin-top: 0;
+}
+
+main .home-start-label {
+	margin: 0 0 0.35rem;
+	font-size: 0.9rem;
+	color: var(--text-muted);
+}
+
+main .home-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 0.25rem;
+}
+
+main .home-actions .btn {
+	margin-top: 0;
+	margin-right: 0;
+}
+
+main .start-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+main .start-row .btn {
+	margin-top: 0;
+	margin-right: 0;
+}
+
+main .field-grid {
+	display: grid;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+main label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	font-size: 0.9rem;
+	color: var(--text-muted);
+}
+
+main input,
+main select {
+	padding: 0.5rem 0.6rem;
+	border-radius: 6px;
+	border: 1px solid var(--border);
+	background: var(--inset);
+	color: var(--text);
+	font-size: 1rem;
+}
+
+main label.checkbox {
+	flex-direction: row;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+main .advanced {
+	margin-bottom: 1rem;
+	color: var(--text-muted);
+}
+
+main .hint {
+	color: var(--success);
+	font-size: 0.9rem;
+}
+
+main .progress-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+	font-size: 1.1rem;
+}
+
+main .practice-status {
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin: 0.5rem 0;
+}
+
+main .practice-hint {
+	font-size: 2.5rem;
+	line-height: 1;
+	margin: 0.25rem 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	justify-content: center;
+}
+
+main .practice-hint .hint-slot {
+	min-width: 1.25em;
+	text-align: center;
+}
+
+main .practice-hint .hint-slot:not(.hint-correct) {
+	color: var(--danger);
+}
+
+main .practice-hint .hint-correct {
+	color: var(--success);
+}
+
+main .practice-sequence {
+	color: var(--text-muted);
+	font-size: 0.95rem;
+	margin: 0 0 0.25rem;
+}
+
+main .practice-reveal {
+	font-size: 2rem;
+	color: var(--success);
+	margin: 0.25rem 0 1rem;
+}
+
+main .practice-live {
+	font-family: var(--font-mono);
+	color: var(--text-muted);
+	margin: 0 0 1rem;
+}
+
+main .meter-wrap {
+	margin-top: 1rem;
+}
+
+main .meter-label {
+	font-size: 0.85rem;
+	margin-bottom: 0.35rem;
+	color: var(--text-muted);
+}
+
+main .meter {
+	position: relative;
+	height: 10px;
+	background: var(--inset);
+	border-radius: 999px;
+	overflow: hidden;
+	border: 1px solid var(--border);
+}
+
+main .meter-fill {
+	height: 100%;
+	width: 0%;
+	background: linear-gradient(90deg, var(--accent-hover), var(--accent));
+	transition: width 80ms linear;
+}
+
+main .meter-fill.above-gate {
+	background: linear-gradient(90deg, color-mix(in srgb, var(--success) 70%, var(--bg)), var(--success));
+}
+
+main .meter-gate {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	margin-left: -1px;
+	background: var(--text);
+	opacity: 0.85;
+	pointer-events: none;
+	z-index: 1;
+}
+
+main .gate-slider {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	margin-top: 0.65rem;
+	font-size: 0.85rem;
+}
+
+main .gate-slider input[type='range'] {
+	flex: 1;
+	min-width: 0;
+	padding: 0;
+	border: none;
+	background: transparent;
+	accent-color: var(--accent);
+}
+
+main .gate-hint {
+	margin: 0.35rem 0 0;
+	font-size: 0.8rem;
+	color: var(--text-muted);
+}
+
+main .stats-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem 1rem;
+	margin: 0 0 1.5rem;
+}
+
+main .stats-grid dt {
+	color: var(--text-muted);
+	font-size: 0.85rem;
+}
+
+main .stats-grid dd {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 600;
+}
+
+main .per-note-list {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 1.5rem;
+}
+
+main .per-note-list li {
+	display: flex;
+	justify-content: space-between;
+	padding: 0.4rem 0;
+	border-bottom: 1px solid var(--border);
+	font-size: 0.95rem;
+}
+
+main .per-note-list .wrong {
+	color: var(--danger);
+}
+
+main :where(.tuner-title, .metronome-title, .drum-title) {
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--text-muted);
+}
+
+main .tuner-note {
+	font-size: 2.75rem;
+	font-weight: 600;
+	text-align: center;
+	margin: 0.5rem 0 0.25rem;
+	letter-spacing: 0.02em;
+}
+
+main .tuner-card.in-tune .tuner-note {
+	color: var(--success);
+}
+
+main .tuner-cents {
+	text-align: center;
+	font-size: 1.25rem;
+	margin: 0 0 0.25rem;
+	min-height: 1.5rem;
+}
+
+main .tuner-freq {
+	font-family: var(--font-mono);
+	color: var(--text-muted);
+	text-align: center;
+	margin: 0 0 1.25rem;
+	min-height: 1.25rem;
+}
+
+main .tuner-gauge {
+	position: relative;
+	height: 12px;
+	margin: 0 0 1.25rem;
+	background: var(--inset);
+	border: 1px solid var(--border);
+	border-radius: 999px;
+	overflow: hidden;
+}
+
+main .tuner-center {
+	position: absolute;
+	left: 50%;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	margin-left: -1px;
+	background: var(--text-muted);
+	opacity: 0.6;
+}
+
+main .tuner-needle {
+	position: absolute;
+	top: 1px;
+	bottom: 1px;
+	width: 4px;
+	margin-left: -2px;
+	left: 50%;
+	border-radius: 2px;
+	background: var(--accent);
+	transition: left 60ms linear;
+}
+
+main .tuner-card.in-tune .tuner-needle {
+	background: var(--success);
+}
+
+main .metronome-controls {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1.5rem;
+	margin-top: 0.5rem;
+}
+
+main .metronome-play {
+	min-width: 8rem;
+	margin: 0;
+}
+
+main .tempo-dial-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+}
+
+main .tempo-dial-label {
+	font-size: 0.85rem;
+	color: var(--text-muted);
+}
+
+main .tempo-dial {
+	position: relative;
+	width: 10rem;
+	height: 10rem;
+	border-radius: 50%;
+	border: 3px solid var(--border);
+	background: radial-gradient(
+		circle at 35% 30%,
+		color-mix(in srgb, var(--border) 50%, var(--bg-elevated)) 0%,
+		var(--bg-elevated) 65%
+	);
+	touch-action: none;
+	cursor: grab;
+	user-select: none;
+}
+
+main .tempo-dial:active {
+	cursor: grabbing;
+}
+
+main .tempo-dial:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+}
+
+main .tempo-dial-knob {
+	position: absolute;
+	top: 0.65rem;
+	left: 50%;
+	width: 4px;
+	height: 1.35rem;
+	margin-left: -2px;
+	border-radius: 2px;
+	background: var(--accent);
+	transform-origin: 50% calc(5rem - 0.65rem);
+	transform: rotate(0deg);
+	pointer-events: none;
+}
+
+main .metronome-card.beat-pulse .tempo-dial {
+	border-color: var(--accent-hover);
+}
+
+main .tempo-dial-value {
+	position: absolute;
+	top: 42%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 1.75rem;
+	font-weight: 700;
+	letter-spacing: -0.03em;
+	pointer-events: none;
+}
+
+main .tempo-dial-unit {
+	position: absolute;
+	top: 58%;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 0.75rem;
+	color: var(--text-muted);
+	pointer-events: none;
+}
+
+main .tempo-stepper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.35rem;
+	margin-top: 0.5rem;
+}
+
+main .tempo-stepper-btn-wide {
+	min-width: 2.75rem;
+}
+
+main .tempo-tap-btn {
+	width: 100%;
+	max-width: 10rem;
+	margin-top: 0.25rem;
+}
+
+main .stepper-field {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+}
+
+main .stepper-label {
+	font-size: 0.85rem;
+	color: var(--text-muted);
+}
+
+main .stepper-label-row {
+	justify-content: center;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+}
+
+main .stepper-field:has(#metronome-beats:disabled) .stepper {
+	opacity: 0.45;
+}
+
+main .stepper {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+main .stepper-btn {
+	margin: 0;
+	min-width: 2.25rem;
+	padding: 0.35rem 0.5rem;
+}
+
+main .stepper-input {
+	width: 3rem;
+	text-align: center;
+	font-size: 1.1rem;
+	font-weight: 600;
+	padding: 0.35rem 0.25rem;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: var(--bg);
+	color: var(--text);
+	-moz-appearance: textfield;
+}
+
+main .stepper-input::-webkit-outer-spin-button,
+main .stepper-input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+main .stepper-btn:disabled {
+	opacity: 0.35;
+	cursor: not-allowed;
+}
+
+main .metronome-volume {
+	width: 100%;
+	max-width: 18rem;
+}
+
+main .drum-controls {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	margin-top: 0.5rem;
+}
+
+main .drum-transport {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	justify-content: center;
+}
+
+main .drum-play {
+	min-width: 8rem;
+	margin: 0;
+}
+
+main .drum-tempo {
+	width: 100%;
+	max-width: 20rem;
+	margin: 0 auto;
+}
+
+main .drum-volumes {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.75rem;
+	width: 100%;
+	max-width: 22rem;
+	margin: 0 auto;
+}
+
+main .drum-vol-slider {
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	margin: 0;
+	gap: 0.35rem;
+}
+
+main .drum-vol-mark {
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text);
+	letter-spacing: 0.02em;
+}
+
+main .drum-vol-slider input[type='range'] {
+	width: 100%;
+}
+
+main .drum-bpm-readout {
+	display: block;
+	text-align: center;
+	font-size: 0.95rem;
+	font-weight: 600;
+	margin-top: 0.35rem;
+}
+
+main .drum-steppers {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem 1.5rem;
+	justify-content: center;
+	width: 100%;
+}
+
+main .drum-grid {
+	width: 100%;
+	margin-top: 0.25rem;
+}
+
+main .drum-grid-scroll {
+	overflow-x: auto;
+	padding-bottom: 0.25rem;
+}
+
+main .drum-grid-inner {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	min-width: min-content;
+}
+
+main .drum-row {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+main .drum-row-label {
+	flex: 0 0 2rem;
+	font-size: 0.75rem;
+	color: var(--text-muted);
+	text-align: right;
+	padding-right: 0.25rem;
+	line-height: 1.2;
+}
+
+main .drum-steps {
+	display: flex;
+	gap: 0.2rem;
+}
+
+main .drum-step {
+	flex: 0 0 1.35rem;
+	width: 1.35rem;
+	height: 1.35rem;
+	margin: 0;
+	padding: 0;
+	border-radius: 6px;
+	border: 1px solid var(--border);
+	background: var(--bg);
+	cursor: pointer;
+}
+
+main .drum-step:hover {
+	border-color: var(--accent-hover);
+}
+
+main .drum-step-on {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: #fff;
+}
+
+main .drum-step-current {
+	box-shadow: 0 0 0 2px var(--text);
+}
+
+main .drum-step-on.drum-step-current {
+	box-shadow: 0 0 0 2px var(--text), inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+main .drum-step.drum-beat-mark {
+	border-color: color-mix(in srgb, var(--border) 70%, var(--accent) 30%);
 }

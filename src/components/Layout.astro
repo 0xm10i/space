@@ -6,13 +6,11 @@ import { profile } from '../data/profile';
 interface Props {
 	title?: string;
 	description?: string;
-	showBlogNav?: boolean;
 }
 
 const {
 	title = profile.name,
 	description = profile.bio,
-	showBlogNav = false,
 } = Astro.props;
 
 const pageTitle = title === profile.name ? `${profile.name} · m10i.space` : `${title} · m10i.space`;
@@ -43,23 +41,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 				<MorphingSiteTitle />
 				<nav class="site-nav" aria-label="Main">
 					<a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>Home</a>
-					<a
-						href="/bass-tools/"
-						aria-current={Astro.url.pathname.startsWith('/bass-tools') ? 'page' : undefined}
-					>
-						Bass Tools
-					</a>
-					<a
-						href="/talk-back/"
-						aria-current={Astro.url.pathname.startsWith('/talk-back') ? 'page' : undefined}
-					>
-						Talk Back
-					</a>
-					{showBlogNav && (
-						<a href="/blog" aria-current={Astro.url.pathname.startsWith('/blog') ? 'page' : undefined}>
-							Blog
-						</a>
-					)}
 					<a href={profile.links[0]?.href ?? 'https://github.com'} rel="noopener noreferrer">GitHub</a>
 				</nav>
 			</div>
