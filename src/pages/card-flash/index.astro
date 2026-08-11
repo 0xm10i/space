@@ -1,0 +1,61 @@
+---
+import Layout from '../../components/Layout.astro';
+import '../../styles/card-flash.css';
+
+const description =
+	'Focus game — five piles of seven cards, remember each flash, pick two pile tops to form poker-style hands for points across 17 rounds.';
+---
+
+<Layout title="Card Flash" description={description}>
+	<div class="card-flash">
+		<section id="view-home" class="view view-active">
+			<header class="page-intro">
+				<h1>Card Flash</h1>
+				<p class="page-intro__desc">
+					You get five piles of seven cards. After a random pause, a card flashes briefly — memorize it, then
+					pick exactly two pile tops within five seconds. Your flash plus those two cards score together: pairs,
+					suit matches, straights, flushes, and three of a kind stack (triple aces score big). Wrong hands and
+					timeouts with no picks cost a heart; stopping at one pick ends the run. Survive all 17 flash cards or
+					keep your three hearts.
+				</p>
+				<div class="home-actions">
+					<button type="button" id="btn-start" class="btn btn-primary">Start</button>
+				</div>
+			</header>
+		</section>
+
+		<section id="view-play" class="view" hidden>
+			<div class="play-shell">
+				<div class="play-header">
+					<p id="play-score" class="play-score" aria-live="polite">Score: 0</p>
+					<div id="play-hearts" class="play-hearts" role="img" aria-label="3 lives">
+						<span class="heart heart--full" aria-hidden="true">♥</span>
+						<span class="heart heart--full" aria-hidden="true">♥</span>
+						<span class="heart heart--full" aria-hidden="true">♥</span>
+					</div>
+					<p id="play-timer" class="play-timer" hidden aria-live="off">00:00</p>
+				</div>
+				<div id="playfield" class="playfield" aria-live="polite">
+					<span class="playfield-dot" aria-hidden="true"></span>
+					<div id="flash-slot" class="flash-slot" hidden></div>
+					<div id="reveal-row" class="reveal-row" hidden></div>
+					<p id="score-flash" class="score-flash" hidden aria-live="polite"></p>
+					<p id="response-countdown" class="response-countdown" hidden aria-live="assertive"></p>
+					<div id="playfield-overlay" class="playfield-overlay" hidden>
+						<h2 class="playfield-overlay__title">Game over</h2>
+						<p id="gameover-score" class="playfield-overlay__score"></p>
+						<button type="button" id="btn-play-again" class="btn btn-primary">Play again</button>
+					</div>
+				</div>
+				<div id="piles" class="piles" role="group" aria-label="Card piles"></div>
+				<div class="play-footer">
+					<button type="button" id="btn-stop" class="btn btn-secondary btn-small">Stop</button>
+				</div>
+			</div>
+		</section>
+	</div>
+</Layout>
+
+<script>
+	import '../../scripts/card-flash/app.js';
+</script>

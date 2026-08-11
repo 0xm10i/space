@@ -1,0 +1,394 @@
+.card-flash {
+	--card-red: #b42318;
+	--card-black: var(--text);
+	--playfield-bg: #ffffff;
+	--card-bg: var(--bg-elevated);
+	--card-back: #1e3a5f;
+	--card-back-pattern: #2a4a73;
+	--card-border: var(--border);
+	--card-selected: var(--accent);
+	--dot-red: #b42318;
+	--heart-red: #b42318;
+}
+
+@media (prefers-color-scheme: dark) {
+	.card-flash {
+		--card-red: #f87171;
+		--playfield-bg: #f5f5f5;
+		--card-bg: #ffffff;
+		--card-black: #1a1a1a;
+		--dot-red: #b42318;
+		--heart-red: #b42318;
+	}
+}
+
+.card-flash .view {
+	display: none;
+}
+
+.card-flash .view-active {
+	display: block;
+}
+
+.play-shell {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space);
+	min-height: min(70vh, 32rem);
+	position: relative;
+}
+
+.play-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: var(--space);
+}
+
+.play-score {
+	margin: 0;
+	font-family: var(--font-mono);
+	font-size: 0.875rem;
+	color: var(--text-muted);
+	flex: 1;
+}
+
+.play-hearts {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.35rem;
+	flex: 1;
+}
+
+.heart {
+	font-size: 1.125rem;
+	line-height: 1;
+}
+
+.heart--full {
+	color: var(--heart-red);
+}
+
+.heart--empty {
+	color: transparent;
+	-webkit-text-stroke: 1.5px var(--card-black);
+}
+
+.play-timer {
+	margin: 0;
+	font-family: var(--font-mono);
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--text-muted);
+	tabular-nums: 1;
+	flex: 1;
+	text-align: right;
+}
+
+.playfield {
+	flex: 1;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 16rem;
+	background: var(--playfield-bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+}
+
+.playfield-dot {
+	position: absolute;
+	width: 0.25rem;
+	height: 0.25rem;
+	border-radius: 50%;
+	background: var(--dot-red);
+}
+
+.flash-slot {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2;
+}
+
+.reveal-row {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	z-index: 3;
+}
+
+.reveal-row[hidden] {
+	display: none;
+}
+
+.score-flash {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.25rem;
+	margin: 0;
+	z-index: 4;
+	pointer-events: none;
+}
+
+.score-flash[hidden] {
+	display: none;
+}
+
+.score-flash__value {
+	font-family: var(--font-mono);
+	font-weight: 700;
+	line-height: 1;
+	color: var(--card-black);
+	animation: scorePop 600ms ease forwards;
+}
+
+.score-flash__breakdown {
+	font-family: var(--font-sans);
+	font-size: 0.75rem;
+	color: var(--card-black);
+	opacity: 0.85;
+}
+
+.score-flash--small .score-flash__value {
+	font-size: 2rem;
+}
+
+.score-flash--medium .score-flash__value {
+	font-size: 2.75rem;
+}
+
+.score-flash--large .score-flash__value {
+	font-size: 3.5rem;
+}
+
+.score-flash--mega .score-flash__value {
+	font-size: 4.5rem;
+	animation: scoreMega 900ms ease forwards;
+}
+
+@keyframes scorePop {
+	0% {
+		opacity: 0;
+		transform: scale(0.5);
+	}
+	20% {
+		opacity: 1;
+		transform: scale(1.15);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(1);
+	}
+}
+
+@keyframes scoreMega {
+	0% {
+		opacity: 0;
+		transform: scale(0.4);
+	}
+	15% {
+		opacity: 1;
+		transform: scale(1.3);
+	}
+	40% {
+		transform: scale(1.1);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(1.05);
+	}
+}
+
+.response-countdown {
+	position: absolute;
+	margin: 0;
+	font-family: var(--font-mono);
+	font-size: 2.5rem;
+	font-weight: 500;
+	line-height: 1;
+	color: var(--card-black);
+	z-index: 1;
+}
+
+.playfield--gameover .playfield-dot,
+.playfield--gameover .response-countdown,
+.playfield--gameover .flash-slot,
+.playfield--gameover .reveal-row,
+.playfield--gameover .score-flash {
+	visibility: hidden;
+}
+
+.playfield-overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	text-align: center;
+	padding: var(--space);
+	z-index: 5;
+}
+
+.playfield-overlay[hidden] {
+	display: none;
+}
+
+.playfield-overlay__title {
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: var(--card-black);
+}
+
+.playfield-overlay__score {
+	margin: 0;
+	font-size: 1rem;
+	color: var(--card-black);
+}
+
+.piles {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem;
+	padding-top: 0.25rem;
+}
+
+.piles--disabled .playing-card--top {
+	pointer-events: none;
+	opacity: 0.85;
+}
+
+.pile {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.pile__stack {
+	position: relative;
+	width: 2.25rem;
+	height: calc(3.125rem + (var(--stack-count, 1) - 1) * 3px);
+}
+
+.pile__empty-slot {
+	width: 2.25rem;
+	height: 3.125rem;
+	border: 1px dashed var(--border);
+	border-radius: calc(var(--radius) / 2);
+	opacity: 0.35;
+}
+
+.playing-card {
+	appearance: none;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.08rem;
+	width: 2.25rem;
+	height: 3.125rem;
+	padding: 0.25rem;
+	border: 1px solid var(--card-border);
+	border-radius: calc(var(--radius) / 2);
+	background: var(--card-bg);
+	color: var(--card-black);
+	font-family: var(--font-sans);
+	cursor: default;
+	transition: border-color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+
+button.playing-card {
+	cursor: pointer;
+}
+
+.playing-card--stacked {
+	position: absolute;
+	left: 0;
+	bottom: calc(var(--stack-depth, 0) * 3px);
+}
+
+.playing-card:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+button.playing-card:hover:not(:disabled) {
+	border-color: var(--text-muted);
+}
+
+.playing-card--red {
+	color: var(--card-red);
+}
+
+.playing-card--selected {
+	border-color: var(--card-selected);
+	transform: translateY(-0.125rem);
+}
+
+.playing-card--vanish {
+	animation: cardVanish 250ms ease forwards;
+	pointer-events: none;
+}
+
+@keyframes cardVanish {
+	to {
+		opacity: 0;
+		transform: scale(0.6);
+	}
+}
+
+.playing-card--flash {
+	width: 3.25rem;
+	height: 4.5rem;
+	cursor: default;
+}
+
+.playing-card--flash .playing-card__rank {
+	font-size: 1rem;
+}
+
+.playing-card--flash .playing-card__suit {
+	font-size: 1.25rem;
+}
+
+.playing-card--back {
+	background:
+		repeating-linear-gradient(
+			45deg,
+			var(--card-back-pattern) 0,
+			var(--card-back-pattern) 2px,
+			var(--card-back) 2px,
+			var(--card-back) 4px
+		),
+		var(--card-back);
+	border-color: color-mix(in srgb, var(--card-back) 70%, white);
+}
+
+.playing-card__rank {
+	font-size: 0.625rem;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.playing-card__suit {
+	font-size: 0.875rem;
+	line-height: 1;
+}
+
+.play-footer {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: auto;
+}

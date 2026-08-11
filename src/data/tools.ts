@@ -32,4 +32,11 @@ export const tools: Tool[] = [
 		featured: true,
 		tags: ['speech', 'practice'],
 	},
+	{
+		title: 'Card Flash',
+		url: '/card-flash/',
+		description:
+			'Focus game — five piles of seven cards, memorize each flash, pick two tops for combinable poker-style scores across 17 rounds with three hearts.',
+		tags: ['focus', 'game'],
+	},
 ];
