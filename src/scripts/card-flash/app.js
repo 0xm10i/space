@@ -481,15 +481,11 @@ function onResponseTimeout() {
 	const pickCount = selectedPileIndices.length;
 	clearFlashSlot();
 
-	if (pickCount === 0) {
+	if (pickCount < 2) {
 		if (!loseHeart()) return;
 		if (!advanceFlashIndex()) return;
 		scheduleFlash();
 		return;
-	}
-
-	if (pickCount === 1) {
-		endGame({ reason: 'incomplete' });
 	}
 }
 
