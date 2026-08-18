@@ -1,6 +1,15 @@
-import { buildTuning, playableRange, pickRandomSequence, midiToName, TUNING_STRING_COUNT } from './notes.js';
+import {
+  buildTuning,
+  playableRange,
+  pickRandomSequence,
+  midiToName,
+  midiPitchClass,
+  pitchClassesForNoteRange,
+  positionsForMidi,
+  TUNING_STRING_COUNT,
+} from './notes.js';
+import { createNoteBucket } from './note-bucket.js';
 import { playNote, playSuccessBell, resumeAudioContext } from './audio.js';
-import { PitchListener } from './pitch.js';
 
 const PLAYBACK_TAIL_MS = 280;
 const SEQUENCE_GAP_MS = 150;
@@ -11,25 +20,6 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function waitForSilence(listener, maxMs = 3000) {
-  const threshold = listener.noiseGate * 0.6;
-  const start = Date.now();
-  return new Promise((resolve) => {
-    const tick = () => {
-      if (listener.rmsLevel < threshold) {
-        resolve();
-        return;
-      }
-      if (Date.now() - start > maxMs) {
-        resolve();
-        return;
-      }
-      requestAnimationFrame(tick);
-    };
-    tick();
-  });
-}
-
 function buildWrongHints(targetSequence, targetIndex, detectedMidi) {
   return targetSequence.slice(0, targetIndex + 1).map((midi, i) => {
     if (i < targetIndex) return 'correct';
@@ -38,31 +28,41 @@ function buildWrongHints(targetSequence, targetIndex, detectedMidi) {
   });
 }
 
-export function createSession(settings, callbacks) {
+export function createSession(settings, callbacks, answerSource) {
+  if (!answerSource) throw new Error('answerSource is required');
+
   const noteCount = Math.min(3, Math.max(1, settings.noteCount ?? 1));
+  const quizMode = settings.quizMode === 'name' ? 'name' : 'imitate';
   const tuning = buildTuning({
     strings: TUNING_STRING_COUNT,
     lowestMidi: settings.lowestMidi,
     highestMidi: settings.highestMidi,
   });
   const range = playableRange({ tuning, frets: settings.frets });
-  const minFreq = 440 * 2 ** ((range.min - 69) / 12) * 0.9;
-  const maxFreq = 440 * 2 ** ((range.max - 69) / 12) * 1.1;
+  let allowedPitchClasses = pitchClassesForNoteRange(settings.noteRange);
 
-  const listener = new PitchListener({
-    noiseGate: settings.noiseGate,
-    inputGain: settings.inputGain,
-    centsTolerance: settings.centsTolerance,
-    minFreq,
-    maxFreq,
-  });
+  function pickBucketSequence(excludeMidi) {
+    return pickRandomSequence(
+      range.min,
+      range.max,
+      noteCount,
+      settings.maxIntervalSemitones,
+      excludeMidi,
+      allowedPitchClasses,
+    );
+  }
+
+  function sequenceAllowed(seq) {
+    return seq.every((m) => allowedPitchClasses.has(midiPitchClass(m)));
+  }
+
+  const bucket = createNoteBucket({ pickSequence: pickBucketSequence });
 
   let state = 'idle';
   let targetSequence = [];
   let targetIndex = 0;
-  let previousLastMidi = null;
+  let targetPosition = null;
   let roundIndex = 0;
-  let awaitingSilence = false;
   let attemptsOnCurrent = 0;
   let roundStartedAt = 0;
   let playTargetGeneration = 0;
@@ -74,10 +74,25 @@ export function createSession(settings, callbacks) {
       targetSequence,
       targetIndex,
       noteCount,
+      quizMode,
       attemptsOnCurrent,
       progress: stats.completed,
+      promptPosition: targetPosition,
       ...extra,
     };
+  }
+
+  function pickTargetPosition(midi) {
+    const positions = positionsForMidi(tuning, settings.frets, midi);
+    if (positions.length === 0) return null;
+    return positions[Math.floor(Math.random() * positions.length)];
+  }
+
+  function answersMatch(guess, expected) {
+    if (quizMode === 'name') {
+      return midiPitchClass(guess) === midiPitchClass(expected);
+    }
+    return guess === expected;
   }
 
   const stats = {
@@ -107,7 +122,7 @@ export function createSession(settings, callbacks) {
     const generation = ++playTargetGeneration;
     state = 'playing';
     targetIndex = 0;
-    listener.setListeningEnabled(false);
+    answerSource.setAccepting(false);
     callbacks.onStateChange?.(sessionPayload({ hints: pendingHints }));
     await resumeAudioContext();
     for (let i = 0; i < targetSequence.length; i++) {
@@ -120,35 +135,42 @@ export function createSession(settings, callbacks) {
     }
     await delay(PLAYBACK_TAIL_MS);
     if (generation !== playTargetGeneration) return;
-    listener.setMicCaptureEnabled(true);
-    await waitForSilence(listener);
+    await answerSource.waitAfterPlayback();
     if (generation !== playTargetGeneration) return;
-    listener.resetStability();
-    listener.setListeningEnabled(true);
     pendingHints = null;
     state = 'listening';
     callbacks.onStateChange?.(sessionPayload());
+    answerSource.setAccepting(true);
+  }
+
+  async function showNamePrompt() {
+    const generation = ++playTargetGeneration;
+    targetIndex = 0;
+    answerSource.setAccepting(false);
+    pendingHints = null;
+    state = 'listening';
+    callbacks.onStateChange?.(sessionPayload());
+    if (generation !== playTargetGeneration) return;
+    answerSource.setAccepting(true);
+    void resumeAudioContext().then(() => {
+      if (generation !== playTargetGeneration) return;
+      return playNote(targetSequence[0]);
+    });
   }
 
   async function nextNote() {
     if (roundIndex >= settings.notesPerSet) {
       state = 'finished';
       stats.totalTimeMs = Date.now() - stats.startedAt;
-      listener.stop();
+      answerSource.stop();
       callbacks.onFinished?.(getResults(stats));
       return;
     }
     attemptsOnCurrent = 0;
     pendingHints = null;
-    targetSequence = pickRandomSequence(
-      range.min,
-      range.max,
-      noteCount,
-      settings.maxIntervalSemitones,
-      previousLastMidi,
-    );
-    previousLastMidi = targetSequence[targetSequence.length - 1];
+    targetSequence = bucket.current();
     targetIndex = 0;
+    targetPosition = quizMode === 'name' ? pickTargetPosition(targetSequence[0]) : null;
     roundStartedAt = Date.now();
     roundIndex++;
     callbacks.onStateChange?.(
@@ -157,13 +179,17 @@ export function createSession(settings, callbacks) {
         acceptedNames: [],
       }),
     );
-    await playTarget();
+    if (quizMode === 'name') {
+      await showNamePrompt();
+    } else {
+      await playTarget();
+    }
   }
 
   async function handleCorrectCelebration(firstTry) {
     const generation = playTargetGeneration;
     pendingHints = null;
-    listener.setListeningEnabled(false);
+    answerSource.setAccepting(false);
     const revealedNames = targetSequence.map((m) => midiToName(m));
     callbacks.onCorrect?.({ sequence: targetSequence, names: revealedNames, firstTry });
     callbacks.onStateChange?.(
@@ -177,10 +203,12 @@ export function createSession(settings, callbacks) {
     if (generation !== playTargetGeneration) return;
     await delay(CORRECT_HOLD_MS);
     if (generation !== playTargetGeneration) return;
-    listener.setMicCaptureEnabled(true);
-    await waitForSilence(listener);
+    await answerSource.waitAfterPlayback();
     if (generation !== playTargetGeneration) return;
-    awaitingSilence = false;
+    if (firstTry || !sequenceAllowed(bucket.current())) {
+      bucket.replaceCurrent();
+    }
+    bucket.advance();
     await nextNote();
   }
 
@@ -196,22 +224,20 @@ export function createSession(settings, callbacks) {
       }),
     );
     targetIndex++;
-    listener.consumeStable(acceptedMidi);
-    listener.resetStability();
   }
 
-  async function handleStable(detectedMidi) {
-    if (state !== 'listening' || awaitingSilence || !listener.isListeningEnabled()) return;
+  async function submitAnswer(detectedMidi) {
+    if (state !== 'listening') return;
     const expected = targetSequence[targetIndex];
     if (expected == null) return;
-    if (targetIndex > 0 && detectedMidi === targetSequence[targetIndex - 1]) return;
 
-    if (detectedMidi === expected) {
+    if (answersMatch(detectedMidi, expected)) {
       const isLast = targetIndex === targetSequence.length - 1;
       if (!isLast) {
         onSequenceNoteCorrect();
         return;
       }
+      answerSource.setAccepting(false);
       const firstTry = attemptsOnCurrent === 0;
       const elapsed = Date.now() - roundStartedAt;
       stats.noteTimings.push(elapsed);
@@ -224,18 +250,27 @@ export function createSession(settings, callbacks) {
         stats.currentStreak = 0;
       }
       recordPerNote(expected, 0, firstTry);
-      listener.consumeStable(detectedMidi);
-      awaitingSilence = true;
       void handleCorrectCelebration(firstTry);
     } else {
+      answerSource.setAccepting(false);
       attemptsOnCurrent++;
       stats.wrongAttempts++;
       stats.currentStreak = 0;
       recordPerNote(expected, 1, false, false);
+      if (quizMode === 'name') {
+        pendingHints = null;
+        callbacks.onWrong?.({ played: detectedMidi });
+        callbacks.onStateChange?.(sessionPayload({ state: 'wrong' }));
+        const generation = playTargetGeneration;
+        await delay(WRONG_REPLAY_DELAY_MS);
+        if (generation !== playTargetGeneration) return;
+        state = 'listening';
+        callbacks.onStateChange?.(sessionPayload());
+        answerSource.setAccepting(true);
+        return;
+      }
       const hints = buildWrongHints(targetSequence, targetIndex, detectedMidi);
       pendingHints = hints;
-      listener.consumeStable(detectedMidi);
-      listener.resetStability();
       callbacks.onWrong?.({ played: detectedMidi, hints });
       callbacks.onStateChange?.(
         sessionPayload({
@@ -244,7 +279,6 @@ export function createSession(settings, callbacks) {
         }),
       );
       const generation = playTargetGeneration;
-      listener.setListeningEnabled(false);
       targetIndex = 0;
       await delay(WRONG_REPLAY_DELAY_MS);
       if (generation !== playTargetGeneration) return;
@@ -252,35 +286,38 @@ export function createSession(settings, callbacks) {
     }
   }
 
-  listener.onStable((midi) => {
-    void handleStable(midi);
+  answerSource.onAnswer((midi) => {
+    void submitAnswer(midi);
   });
 
   return {
     async start() {
       if (state !== 'idle') return;
       stats.startedAt = Date.now();
-      listener.setListeningEnabled(false);
-      await listener.start(settings.inputDeviceId || undefined);
-      listener.setListeningEnabled(false);
+      answerSource.setAccepting(false);
+      await answerSource.start();
+      answerSource.setAccepting(false);
       state = 'running';
       roundIndex = 0;
-      previousLastMidi = null;
       await nextNote();
     },
     async stop() {
       playTargetGeneration++;
-      listener.stop();
+      answerSource.stop();
       state = 'idle';
     },
     getStats: () => ({ ...stats }),
-    getListener: () => listener,
+    getListener: () => answerSource.getListener?.() ?? null,
     getState: () => state,
     setNoiseGate(value) {
-      listener.setNoiseGate(value);
+      answerSource.setNoiseGate?.(value);
     },
     setInputGain(value) {
-      listener.setInputGain(value);
+      answerSource.setInputGain?.(value);
+    },
+    setNoteRange(value) {
+      allowedPitchClasses = pitchClassesForNoteRange(value);
+      bucket.rebuildInvalidExceptCurrent(sequenceAllowed);
     },
   };
 }

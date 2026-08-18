@@ -1,7 +1,8 @@
-import { nameToMidi } from './notes.js';
+import { nameToMidi, clampNoteRange, NOTE_RANGE_DEFAULT } from './notes.js';
 
 export const DEFAULTS = {
   notesPerSet: 100,
+  noteRange: NOTE_RANGE_DEFAULT,
   lowestNote: 'B0',
   highestNote: 'G2',
   frets: 22,
@@ -34,7 +35,12 @@ export function loadSettings() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return { ...DEFAULTS };
     const parsed = JSON.parse(raw);
-    return { ...DEFAULTS, ...parsed };
+    const merged = { ...DEFAULTS, ...parsed };
+    merged.noteRange = clampNoteRange(merged.noteRange);
+    merged.lowestNote = DEFAULTS.lowestNote;
+    merged.highestNote = DEFAULTS.highestNote;
+    merged.frets = DEFAULTS.frets;
+    return merged;
   } catch {
     return { ...DEFAULTS };
   }
@@ -56,9 +62,6 @@ export function readForm(form) {
   const fd = new FormData(form);
   return {
     notesPerSet: parseInt(fd.get('notesPerSet'), 10),
-    lowestNote: String(fd.get('lowestNote')).trim(),
-    highestNote: String(fd.get('highestNote')).trim(),
-    frets: parseInt(fd.get('frets'), 10),
     maxIntervalSemitones: Math.min(24, Math.max(1, parseInt(fd.get('maxIntervalSemitones'), 10))),
     noiseGate: parseFloat(fd.get('noiseGate')),
     inputGain: Math.min(8, Math.max(0.5, parseFloat(fd.get('inputGain')) || 3)),
@@ -71,9 +74,6 @@ export function readForm(form) {
 
 export function fillForm(form, settings) {
   form.notesPerSet.value = settings.notesPerSet;
-  form.lowestNote.value = settings.lowestNote;
-  form.highestNote.value = settings.highestNote;
-  form.frets.value = settings.frets;
   form.maxIntervalSemitones.value = settings.maxIntervalSemitones;
   form.noiseGate.value = settings.noiseGate;
   if (form.inputGain) form.inputGain.value = settings.inputGain;

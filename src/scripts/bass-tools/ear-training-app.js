@@ -7,9 +7,21 @@ import {
   fillForm,
   saveLastSession,
 } from './settings.js';
-import { midiToName } from './notes.js';
-import { resumeAudioContext, setPlaybackVolume } from './audio.js';
+import {
+  midiToName,
+  midiForPitchClassNear,
+  buildTuning,
+  playableRange,
+  TUNING_STRING_COUNT,
+  noteRangePreview,
+  clampNoteRange,
+  pitchClassesForNoteRange,
+  NOTE_NAMES,
+} from './notes.js';
+import { resumeAudioContext, setPlaybackVolume, playNote } from './audio.js';
 import { listAudioInputDevices as listDevices, INPUT_GAIN_MIN, INPUT_GAIN_MAX } from './pitch.js';
+import { createMicAnswerSource, createFretboardAnswerSource, createNoteNameAnswerSource } from './answer-sources.js';
+import { createFretboard } from './fretboard.js';
 
 const viewHome = document.getElementById('view-home');
 const viewPractice = document.getElementById('view-practice');
@@ -22,13 +34,18 @@ const practiceProgress = document.getElementById('practice-progress');
 const practiceStatus = document.getElementById('practice-status');
 const practiceSequence = document.getElementById('practice-sequence');
 const practiceHint = document.getElementById('practice-hint');
-const practiceReveal = document.getElementById('practice-reveal');
 const practiceLive = document.getElementById('practice-live');
 const micMeter = document.getElementById('mic-meter');
 const micGateMark = document.getElementById('mic-gate-mark');
 const micGateSlider = document.getElementById('mic-gate');
 const micBoostSlider = document.getElementById('mic-boost');
 const playbackVolumeSlider = document.getElementById('playback-volume');
+const noteRangeSlider = document.getElementById('note-range');
+const noteRangePreviewEl = document.getElementById('note-range-preview');
+const micControls = document.getElementById('mic-controls');
+const fretboardWrap = document.getElementById('fretboard-wrap');
+const fretboardMount = document.getElementById('fretboard');
+const noteNamePad = document.getElementById('note-name-pad');
 const resultsSummary = document.getElementById('results-summary');
 const resultsPerNote = document.getElementById('results-per-note');
 const settingsSaved = document.getElementById('settings-saved');
@@ -40,7 +57,14 @@ let settings = loadSettings();
 setPlaybackVolume(settings.playbackVolume);
 let activeSession = null;
 let activeNoteCount = 1;
+let activeInputMode = 'mic';
+let activeFretboard = null;
+let activeNoteNameSource = null;
 let meterRaf = null;
+let noteNamePadAccepting = false;
+let namePromptMidi = null;
+
+const A_PITCH_CLASS = 9;
 
 function meterLevelFraction(rms) {
   return Math.min(1, rms / METER_FULL_SCALE_RMS);
@@ -146,6 +170,79 @@ async function populateDevices() {
   inputDeviceSelect.value = settings.inputDeviceId || '';
 }
 
+function syncNoteRangeUi() {
+  if (noteRangeSlider) noteRangeSlider.value = String(clampNoteRange(settings.noteRange));
+  if (noteRangePreviewEl) noteRangePreviewEl.textContent = noteRangePreview(settings.noteRange);
+}
+
+function bindNoteRangeSlider() {
+  if (!noteRangeSlider) return;
+  syncNoteRangeUi();
+  noteRangeSlider.addEventListener('input', () => {
+    const value = clampNoteRange(noteRangeSlider.value);
+    settings.noteRange = value;
+    if (noteRangePreviewEl) noteRangePreviewEl.textContent = noteRangePreview(value);
+    if (activeSession) activeSession.setNoteRange(value);
+    if (activeFretboard && activeInputMode !== 'name') {
+      activeFretboard.setAllowedPitchClasses(pitchClassesForNoteRange(value));
+    }
+    syncNoteNamePad();
+  });
+  noteRangeSlider.addEventListener('change', () => {
+    saveSettings(settings);
+  });
+}
+
+function syncNoteNamePad() {
+  if (!noteNamePad) return;
+  const allowed = pitchClassesForNoteRange(settings.noteRange);
+  for (const btn of noteNamePad.querySelectorAll('.note-name-btn')) {
+    const pc = parseInt(btn.dataset.pitchClass, 10);
+    const inRange = allowed.has(pc);
+    btn.classList.toggle('note-name-btn--out-of-range', !inRange);
+    btn.disabled = !inRange || !noteNamePadAccepting;
+  }
+}
+
+function setNoteNamePadAccepting(enabled) {
+  noteNamePadAccepting = enabled;
+  syncNoteNamePad();
+}
+
+function buildNoteNamePad() {
+  if (!noteNamePad) return;
+  noteNamePad.replaceChildren();
+  for (let i = 0; i < 12; i++) {
+    const pc = (A_PITCH_CLASS + i) % 12;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-secondary note-name-btn';
+    btn.dataset.pitchClass = String(pc);
+    btn.textContent = NOTE_NAMES[pc];
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      const around = namePromptMidi ?? 40;
+      void resumeAudioContext().then(() => playNote(midiForPitchClassNear(pc, around)));
+      activeNoteNameSource?.submit(pc);
+    });
+    noteNamePad.appendChild(btn);
+  }
+  syncNoteNamePad();
+}
+
+function applyPromptHighlight(payload) {
+  if (!activeFretboard) return;
+  const pos = payload.promptPosition;
+  const show =
+    pos &&
+    (payload.state === 'listening' || payload.state === 'wrong' || payload.state === 'correct');
+  if (show) {
+    activeFretboard.highlight(pos.string, pos.fret);
+  } else {
+    activeFretboard.clearHighlight();
+  }
+}
+
 function bindSettings() {
   fillForm(settingsForm, settings);
   populateDevices();
@@ -154,12 +251,13 @@ function bindSettings() {
 settingsForm.addEventListener('submit', (e) => {
   e.preventDefault();
   try {
-    settings = readForm(settingsForm);
+    settings = { ...settings, ...readForm(settingsForm) };
     saveSettings(settings);
     setPlaybackVolume(settings.playbackVolume);
     syncGateSliderUi(micGateSlider, micGateMark);
     syncInputGainUi(micBoostSlider);
     syncPlaybackVolumeUi(playbackVolumeSlider);
+    syncNoteRangeUi();
     if (activeSession) {
       activeSession.setNoiseGate(settings.noiseGate);
       activeSession.setInputGain(settings.inputGain);
@@ -177,8 +275,13 @@ btnToggleSettings.addEventListener('click', () => {
 
 function clearPracticeHint() {
   practiceHint.innerHTML = '';
+  const placeholder = document.createElement('span');
+  placeholder.className = 'hint-slot hint-slot-placeholder';
+  placeholder.setAttribute('aria-hidden', 'true');
+  placeholder.textContent = '↑';
+  practiceHint.appendChild(placeholder);
   practiceHint.removeAttribute('aria-label');
-  practiceHint.classList.add('hidden');
+  practiceHint.classList.remove('hidden');
 }
 
 const HINT_LABELS = {
@@ -211,7 +314,20 @@ function renderHints(hints) {
     labels.push(`note ${i + 1} ${HINT_LABELS[kind] || kind}`);
   });
   practiceHint.setAttribute('aria-label', labels.join(', '));
-  practiceHint.classList.remove('hidden');
+}
+
+function renderRevealedNames(names) {
+  const list = (names || []).filter(Boolean);
+  if (list.length === 0) {
+    clearPracticeHint();
+    return;
+  }
+  practiceHint.innerHTML = '';
+  const span = document.createElement('span');
+  span.className = 'hint-reveal';
+  span.textContent = list.join(' · ');
+  practiceHint.appendChild(span);
+  practiceHint.setAttribute('aria-label', list.join(', '));
 }
 
 function updateSequenceProgress(noteCount, targetIndex, state) {
@@ -235,39 +351,66 @@ function updateSequenceProgress(noteCount, targetIndex, state) {
 function updatePracticeUi(payload) {
   const midiSettings = settingsToMidi(settings);
   const noteCount = payload.noteCount ?? activeNoteCount;
+  const nameMode = payload.quizMode === 'name' || activeInputMode === 'name';
   practiceProgress.textContent = `${payload.progress ?? 0} / ${midiSettings.notesPerSet}`;
 
   updateSequenceProgress(noteCount, payload.targetIndex ?? 0, payload.state);
+  applyPromptHighlight(payload);
+  if (Array.isArray(payload.targetSequence) && payload.targetSequence.length > 0) {
+    namePromptMidi = payload.targetSequence[0];
+  }
+  setNoteNamePadAccepting(nameMode && payload.state === 'listening');
 
   if (payload.state === 'pick') {
     clearPracticeHint();
-    practiceReveal.classList.add('hidden');
   } else if (payload.state === 'playing') {
     practiceStatus.textContent = noteCount > 1 ? 'Listen…' : 'Listen…';
-    practiceReveal.classList.add('hidden');
     renderHints(payload.hints);
   } else if (payload.state === 'listening') {
-    practiceStatus.textContent = noteCount > 1 ? 'Play the sequence' : 'Play the note';
-    practiceReveal.classList.add('hidden');
-    clearPracticeHint();
+    practiceStatus.textContent = promptForAnswer(noteCount);
+    if (!nameMode) clearPracticeHint();
   } else if (payload.state === 'sequence-progress') {
-    practiceStatus.textContent = noteCount > 1 ? 'Play the sequence' : 'Play the note';
-    if (payload.partialReveal) {
-      practiceReveal.textContent = payload.acceptedNames?.join(' · ') ?? payload.partialReveal;
-      practiceReveal.classList.remove('hidden');
-    }
+    practiceStatus.textContent = promptForAnswer(noteCount);
+    renderRevealedNames(payload.acceptedNames ?? [payload.partialReveal]);
   } else if (payload.state === 'wrong') {
-    practiceStatus.textContent = 'Not quite — listen again';
-    practiceReveal.classList.add('hidden');
+    practiceStatus.textContent = nameMode ? 'Not quite — try again' : 'Not quite — listen again';
     clearPracticeHint();
   } else if (payload.state === 'correct') {
     practiceStatus.textContent = 'Correct!';
-    clearPracticeHint();
-    const names = payload.revealedNames ?? [];
-    practiceReveal.textContent = names.length ? names.join(' · ') : '';
-    practiceReveal.classList.remove('hidden');
+    renderRevealedNames(payload.revealedNames);
     practiceSequence.classList.add('hidden');
   }
+}
+
+function promptForAnswer(noteCount) {
+  if (activeInputMode === 'name') return 'Name the note';
+  const verb = activeInputMode === 'fretboard' ? 'Tap' : 'Play';
+  return noteCount > 1 ? `${verb} the sequence` : `${verb} the note`;
+}
+
+function setPracticeChrome(inputMode) {
+  const showFretboard = inputMode === 'fretboard' || inputMode === 'name';
+  const showMic = inputMode === 'mic';
+  const showPad = inputMode === 'name';
+  micControls.classList.toggle('hidden', !showMic);
+  fretboardWrap.classList.toggle('hidden', !showFretboard);
+  noteNamePad?.classList.toggle('hidden', !showPad);
+}
+
+function destroyFretboard() {
+  if (activeFretboard) {
+    activeFretboard.destroy();
+    activeFretboard = null;
+  }
+}
+
+function endPracticeUi() {
+  stopMeter();
+  destroyFretboard();
+  activeNoteNameSource = null;
+  namePromptMidi = null;
+  setNoteNamePadAccepting(false);
+  setPracticeChrome('mic');
 }
 
 function startMeter(listener) {
@@ -318,16 +461,54 @@ function renderResults(results) {
   }
 }
 
-async function startPractice(noteCount) {
+async function startPractice(noteCount, inputMode) {
   try {
     await resumeAudioContext();
-    activeNoteCount = noteCount;
-    const midiSettings = { ...settingsToMidi(settings), noteCount };
+    activeInputMode =
+      inputMode === 'fretboard' ? 'fretboard' : inputMode === 'name' ? 'name' : 'mic';
+    activeNoteCount = activeInputMode === 'name' ? 1 : noteCount;
+    const midiSettings = {
+      ...settingsToMidi(settings),
+      noteCount: activeNoteCount,
+      quizMode: activeInputMode === 'name' ? 'name' : 'imitate',
+    };
+    const tuning = buildTuning({
+      strings: TUNING_STRING_COUNT,
+      lowestMidi: midiSettings.lowestMidi,
+      highestMidi: midiSettings.highestMidi,
+    });
+
+    destroyFretboard();
+    activeNoteNameSource = null;
+    namePromptMidi = null;
+    setNoteNamePadAccepting(false);
+    setPracticeChrome(activeInputMode);
     showView('practice');
-    practiceReveal.classList.add('hidden');
     clearPracticeHint();
     practiceSequence.classList.add('hidden');
     practiceStatus.textContent = 'Starting…';
+
+    let answerSource;
+    if (activeInputMode === 'fretboard') {
+      activeFretboard = createFretboard(fretboardMount, {
+        tuning,
+        frets: midiSettings.frets,
+        allowedPitchClasses: pitchClassesForNoteRange(settings.noteRange),
+      });
+      answerSource = createFretboardAnswerSource(activeFretboard);
+    } else if (activeInputMode === 'name') {
+      activeFretboard = createFretboard(fretboardMount, {
+        tuning,
+        frets: midiSettings.frets,
+        dimWhenInactive: false,
+      });
+      activeNoteNameSource = createNoteNameAnswerSource();
+      answerSource = activeNoteNameSource;
+      syncNoteNamePad();
+    } else {
+      const range = playableRange({ tuning, frets: midiSettings.frets });
+      answerSource = createMicAnswerSource(midiSettings, range);
+    }
 
     activeSession = createSession(midiSettings, {
       onStateChange: updatePracticeUi,
@@ -335,30 +516,37 @@ async function startPractice(noteCount) {
       onWrong: () => {},
       onFinished: (results) => {
         saveLastSession(results);
-        stopMeter();
+        endPracticeUi();
         activeSession = null;
         renderResults(results);
         showView('results');
       },
-    });
+    }, answerSource);
 
     syncGateSliderUi(micGateSlider, micGateMark);
     syncInputGainUi(micBoostSlider);
     syncPlaybackVolumeUi(playbackVolumeSlider);
-    startMeter(activeSession.getListener());
+    syncNoteRangeUi();
+    const listener = activeSession.getListener();
+    if (listener) startMeter(listener);
     await activeSession.start();
   } catch (err) {
     activeSession = null;
-    stopMeter();
+    endPracticeUi();
     showView('home');
-    alert(err.message || 'Could not start practice. Check microphone permission.');
+    const fallback =
+      activeInputMode === 'mic'
+        ? 'Could not start practice. Check microphone permission.'
+        : 'Could not start practice.';
+    alert(err.message || fallback);
   }
 }
 
 for (const btn of document.querySelectorAll('.btn-start')) {
   btn.addEventListener('click', () => {
     const count = parseInt(btn.getAttribute('data-note-count'), 10);
-    void startPractice(count);
+    const input = btn.getAttribute('data-input') || 'mic';
+    void startPractice(count, input);
   });
 }
 
@@ -367,13 +555,15 @@ btnStop.addEventListener('click', async () => {
     await activeSession.stop();
     activeSession = null;
   }
-  stopMeter();
+  endPracticeUi();
   showView('home');
 });
 
 btnHome.addEventListener('click', () => showView('home'));
 
 bindSettings();
+bindNoteRangeSlider();
+buildNoteNamePad();
 bindGateSlider(micGateSlider, micGateMark, (value) => {
   if (activeSession) activeSession.setNoiseGate(value);
 });

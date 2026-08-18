@@ -58,6 +58,19 @@ main .start-row .btn {
 	margin-right: 0;
 }
 
+main .home-mode {
+	margin-top: 1.25rem;
+}
+
+main .home-mode .home-start-label {
+	font-weight: 600;
+	color: var(--text);
+}
+
+main .home-settings-row {
+	margin-top: 1.25rem;
+}
+
 main .field-grid {
 	display: grid;
 	gap: 0.75rem;
@@ -120,11 +133,16 @@ main .practice-hint {
 	flex-wrap: wrap;
 	gap: 0.75rem;
 	justify-content: center;
+	min-height: 1em;
 }
 
 main .practice-hint .hint-slot {
 	min-width: 1.25em;
 	text-align: center;
+}
+
+main .practice-hint .hint-slot-placeholder {
+	visibility: hidden;
 }
 
 main .practice-hint .hint-slot:not(.hint-correct) {
@@ -135,16 +153,16 @@ main .practice-hint .hint-correct {
 	color: var(--success);
 }
 
+main .practice-hint .hint-reveal {
+	color: var(--success);
+	font-size: 2rem;
+	line-height: 1.25;
+}
+
 main .practice-sequence {
 	color: var(--text-muted);
 	font-size: 0.95rem;
 	margin: 0 0 0.25rem;
-}
-
-main .practice-reveal {
-	font-size: 2rem;
-	color: var(--success);
-	margin: 0.25rem 0 1rem;
 }
 
 main .practice-live {
@@ -217,6 +235,192 @@ main .gate-hint {
 	margin: 0.35rem 0 0;
 	font-size: 0.8rem;
 	color: var(--text-muted);
+}
+
+main .note-range-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+main .note-range-field .gate-slider {
+	margin-top: 0;
+}
+
+main .note-range-preview {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	line-height: 1.35;
+}
+
+main .practice-volume {
+	margin-top: 0.85rem;
+}
+
+main .practice-note-range {
+	margin-top: 0.85rem;
+}
+
+main .note-name-pad {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	gap: 0.4rem;
+	margin-top: 1rem;
+}
+
+main .note-name-btn {
+	margin: 0;
+	min-width: 0;
+	padding: 0.55rem 0.25rem;
+}
+
+main .note-name-btn:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+main .note-name-btn--out-of-range:disabled {
+	opacity: 0.28;
+	filter: grayscale(0.6);
+}
+
+main .fretboard-wrap {
+	margin-top: 1rem;
+}
+
+main .fretboard-scroll {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	padding-bottom: 0.35rem;
+}
+
+main .fretboard-neck {
+	display: grid;
+	grid-template-rows: repeat(var(--string-count), 1.65rem);
+	position: relative;
+	min-width: min-content;
+	background-color: #e6c98a;
+	background-image:
+		repeating-linear-gradient(
+			90deg,
+			transparent 0,
+			transparent 3px,
+			color-mix(in srgb, #c9a66b 22%, transparent) 3px,
+			color-mix(in srgb, #c9a66b 22%, transparent) 4px
+		),
+		linear-gradient(180deg, #f3e0b0 0%, #e6c98a 48%, #d4b070 100%);
+	border: 1px solid #b8955a;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+main .fretboard-inactive {
+	opacity: 0.55;
+}
+
+main .fretboard-inlay {
+	pointer-events: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1;
+}
+
+main .fretboard-inlay::after {
+	content: '';
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: 50%;
+	background: #2a241c;
+	opacity: 0.85;
+}
+
+main .fretboard-inlay--double {
+	flex-direction: column;
+	gap: 28%;
+}
+
+main .fretboard-inlay--double::before {
+	content: '';
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: 50%;
+	background: #2a241c;
+	opacity: 0.85;
+}
+
+main .fretboard-string-line {
+	pointer-events: none;
+	align-self: center;
+	height: var(--string-width);
+	background: linear-gradient(180deg, #c8c4be, #7a7670);
+	border-radius: 999px;
+	z-index: 1;
+	opacity: 0.85;
+}
+
+main .fretboard-cell {
+	position: relative;
+	z-index: 2;
+	margin: 0;
+	padding: 0;
+	border: none;
+	border-right: 1.5px solid color-mix(in srgb, #8a8680 55%, #4a4640);
+	background: transparent;
+	cursor: pointer;
+	border-radius: 0;
+	touch-action: manipulation;
+	appearance: none;
+	-webkit-appearance: none;
+	color: inherit;
+	min-width: 0;
+	min-height: 0;
+}
+
+main .fretboard-cell--nut {
+	border-right-width: 4px;
+	border-right-color: #f4eee4;
+	background: color-mix(in srgb, #f7f1e4 42%, transparent);
+}
+
+main .fretboard-cell:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+main .fretboard-cell:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: -2px;
+}
+
+main .fretboard-cell:disabled {
+	cursor: default;
+	opacity: 1;
+}
+
+main .fretboard-cell--out-of-range {
+	background: color-mix(in srgb, #3a3228 32%, transparent);
+}
+
+main .fretboard-cell--nut.fretboard-cell--out-of-range {
+	background: color-mix(in srgb, #3a3228 42%, transparent);
+}
+
+main .fretboard-cell--out-of-range:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--accent) 12%, #3a3228 28%);
+}
+
+main .fretboard-cell--flash {
+	background: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+main .fretboard-cell--prompt {
+	background: color-mix(in srgb, var(--accent) 62%, transparent);
+	box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+main .fretboard-cell--out-of-range.fretboard-cell--prompt {
+	background: color-mix(in srgb, var(--accent) 62%, transparent);
 }
 
 main .stats-grid {

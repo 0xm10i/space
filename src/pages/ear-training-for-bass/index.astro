@@ -3,23 +3,55 @@ import Layout from '../../components/Layout.astro';
 import '../../styles/bass-tools.css';
 
 const description =
-	'Note imitation practice for bass. Random notes play through your speakers; play them back on your instrument by ear.';
+	'Note imitation and fretboard practice for bass. Hear a note and play it back, tap it on an on-screen fretboard, or name a highlighted fret.';
 ---
 
-<Layout title="Ear Training for Bass" description={description}>
+<Layout title="Ear Training for 5-String Bass" description={description}>
 	<section id="view-home" class="view view-active">
 		<header class="page-intro">
-			<h1>Ear Training for Bass</h1>
+			<h1>Ear Training for 5-String Bass</h1>
 			<p class="page-intro__desc">
-				Random notes in your configured range play through your speakers; play them back on your bass in the
-				same order. Note names stay hidden until you match each one. Use headphones so the mic does not pick up
-				the reference tones.
+				Practice in your configured range three ways: hear a note and play it back on your bass, tap it on the
+				on-screen fretboard, or name a highlighted fret. Note names stay hidden until you match each one. Use
+				headphones in play-back mode so the mic does not pick up the reference tones.
 			</p>
-			<p class="home-start-label">Notes per round</p>
-			<div class="home-actions start-row">
-				<button type="button" class="btn btn-primary btn-start" data-note-count="1">1 note</button>
-				<button type="button" class="btn btn-secondary btn-start" data-note-count="2">2 notes</button>
-				<button type="button" class="btn btn-secondary btn-start" data-note-count="3">3 notes</button>
+			<div class="home-mode">
+				<p class="home-start-label">Play it back on your bass</p>
+				<div class="home-actions start-row">
+					<button type="button" class="btn btn-primary btn-start" data-note-count="1" data-input="mic">
+						1 note
+					</button>
+					<button type="button" class="btn btn-secondary btn-start" data-note-count="2" data-input="mic">
+						2 notes
+					</button>
+					<button type="button" class="btn btn-secondary btn-start" data-note-count="3" data-input="mic">
+						3 notes
+					</button>
+				</div>
+			</div>
+			<div class="home-mode">
+				<p class="home-start-label">Find it on the fretboard</p>
+				<div class="home-actions start-row">
+					<button type="button" class="btn btn-primary btn-start" data-note-count="1" data-input="fretboard">
+						1 note
+					</button>
+					<button type="button" class="btn btn-secondary btn-start" data-note-count="2" data-input="fretboard">
+						2 notes
+					</button>
+					<button type="button" class="btn btn-secondary btn-start" data-note-count="3" data-input="fretboard">
+						3 notes
+					</button>
+				</div>
+			</div>
+			<div class="home-mode">
+				<p class="home-start-label">Name the note on the fretboard</p>
+				<div class="home-actions start-row">
+					<button type="button" class="btn btn-primary btn-start" data-note-count="1" data-input="name">
+						Start
+					</button>
+				</div>
+			</div>
+			<div class="home-actions home-settings-row">
 				<button type="button" id="btn-toggle-settings" class="btn btn-secondary">Settings</button>
 			</div>
 		</header>
@@ -30,18 +62,6 @@ const description =
 				<label>
 					Notes per set
 					<input type="number" name="notesPerSet" min="1" max="500" required />
-				</label>
-				<label>
-					Lowest string (open)
-					<input type="text" name="lowestNote" placeholder="B0" required />
-				</label>
-				<label>
-					Highest string (open)
-					<input type="text" name="highestNote" placeholder="G2" required />
-				</label>
-				<label>
-					Frets
-					<input type="number" name="frets" min="1" max="36" required />
 				</label>
 				<label>
 					Max interval in a sequence (semitones)
@@ -94,10 +114,11 @@ const description =
 			</div>
 			<p id="practice-status" class="practice-status">Listening…</p>
 			<p id="practice-sequence" class="practice-sequence hidden" aria-live="polite"></p>
-			<p id="practice-hint" class="practice-hint hidden" aria-live="polite"></p>
-			<p id="practice-reveal" class="practice-reveal hidden" aria-live="polite"></p>
+			<p id="practice-hint" class="practice-hint" aria-live="polite">
+				<span class="hint-slot hint-slot-placeholder" aria-hidden="true">↑</span>
+			</p>
 			<p id="practice-live" class="practice-live hidden" aria-live="polite"></p>
-			<div class="meter-wrap">
+			<div class="meter-wrap" id="mic-controls">
 				<label class="meter-label">Mic level</label>
 				<div class="meter">
 					<div id="mic-meter" class="meter-fill"></div>
@@ -112,10 +133,21 @@ const description =
 					<input type="range" id="mic-boost" min="0.5" max="8" step="0.1" />
 				</label>
 				<p class="gate-hint">Notes register when the bar passes the mark.</p>
+			</div>
+			<div class="fretboard-wrap hidden" id="fretboard-wrap">
+				<div id="fretboard"></div>
+			</div>
+			<div id="note-name-pad" class="note-name-pad hidden" role="group" aria-label="Note names"></div>
+			<label class="gate-slider practice-volume">
+				Playback volume
+				<input type="range" id="playback-volume" min="0" max="2" step="0.05" />
+			</label>
+			<div class="note-range-field practice-note-range">
 				<label class="gate-slider">
-					Playback volume
-					<input type="range" id="playback-volume" min="0" max="2" step="0.05" />
+					Notes covered
+					<input type="range" id="note-range" min="1" max="12" step="1" />
 				</label>
+				<p id="note-range-preview" class="note-range-preview">3 — B, E, A</p>
 			</div>
 		</div>
 	</section>

@@ -10,10 +10,10 @@ export type Tool = {
 /** Add one entry per tool — this is the only file to edit when you ship something new. */
 export const tools: Tool[] = [
 	{
-		title: 'Ear Training for Bass',
+		title: 'Ear Training for 5-String Bass',
 		url: '/ear-training-for-bass/',
 		description:
-			'Note imitation practice for bass — random notes play through your speakers; play them back on your instrument by ear.',
+			'Note imitation and fretboard practice for bass — hear a note and play it back, tap it on an on-screen fretboard, or name a highlighted fret.',
 		featured: true,
 		tags: ['music', 'bass', 'ear-training'],
 	},
