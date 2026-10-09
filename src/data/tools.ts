@@ -20,7 +20,7 @@ export const tools: Tool[] = [
 	{
 		title: 'Bass Tools',
 		url: '/bass-tools/',
-		description: 'Chromatic tuner, metronome, and drum machine for bass.',
+		description: 'Chromatic tuner, metronome, drum machine, and evenness practice for bass.',
 		featured: true,
 		tags: ['music', 'bass'],
 	},

@@ -3,18 +3,19 @@ import Layout from '../../components/Layout.astro';
 import '../../styles/bass-tools.css';
 
 const description =
-	'Chromatic tuner, metronome, and drum machine for bass.';
+	'Chromatic tuner, metronome, drum machine, and evenness practice for bass.';
 ---
 
 <Layout title="Bass Tools" description={description}>
 	<section id="view-home" class="view view-active">
 		<header class="page-intro">
 			<h1>Bass Tools</h1>
-			<p class="page-intro__desc">Chromatic tuner, metronome, and drum machine for bass.</p>
+			<p class="page-intro__desc">Chromatic tuner, metronome, drum machine, and evenness practice for bass.</p>
 			<div class="home-actions">
 				<button type="button" id="btn-tuner" class="btn btn-secondary">Tuner</button>
 				<button type="button" id="btn-metronome" class="btn btn-secondary">Metronome</button>
 				<button type="button" id="btn-drum" class="btn btn-secondary">Drum machine</button>
+				<button type="button" id="btn-evenness" class="btn btn-secondary">Evenness</button>
 			</div>
 		</header>
 	</section>
@@ -146,6 +147,58 @@ const description =
 					</div>
 				</div>
 				<div id="drum-grid" class="drum-grid" aria-label="Step sequencer pattern"></div>
+			</div>
+		</div>
+	</section>
+
+	<section id="view-evenness" class="view" hidden>
+		<div class="card evenness-card">
+			<div class="progress-row">
+				<span class="evenness-title">Evenness</span>
+				<button type="button" id="btn-evenness-back" class="btn btn-secondary btn-small">Back</button>
+			</div>
+			<p class="evenness-lead">
+				Compare adjacent strokes on one beat. Blue is the latest odd beat, red is the latest even beat.
+			</p>
+			<div class="evenness-wave-wrap">
+				<canvas id="evenness-wave" class="evenness-wave" width="640" height="180" aria-label="Mic volume over one beat"></canvas>
+				<div class="evenness-legend" aria-hidden="true">
+					<span class="evenness-legend-odd">Odd</span>
+					<span class="evenness-legend-even">Even</span>
+				</div>
+			</div>
+			<div class="evenness-controls">
+				<label class="gate-slider evenness-tempo">
+					Tempo
+					<input type="range" id="evenness-tempo" min="40" max="240" step="1" value="90" />
+					<span id="evenness-bpm" class="drum-bpm-readout">90 BPM</span>
+				</label>
+				<label class="gate-slider evenness-click-volume">
+					Click volume
+					<input type="range" id="evenness-click-volume" min="0" max="2" step="0.05" />
+				</label>
+				<label class="gate-slider evenness-latency">
+					Click latency
+					<input type="range" id="evenness-latency" min="-200" max="200" step="5" value="0" />
+					<span id="evenness-latency-readout" class="drum-bpm-readout">0 ms</span>
+				</label>
+				<p class="gate-hint">Use headphones so the click is not picked up by the microphone. Raise latency if the click sounds after the playhead hits the center line.</p>
+			</div>
+			<div class="meter-wrap">
+				<label class="meter-label">Mic level</label>
+				<div class="meter">
+					<div id="evenness-meter" class="meter-fill"></div>
+				</div>
+				<label class="gate-slider evenness-lowpass">
+					Low-pass
+					<input type="range" id="evenness-lowpass" min="0" max="100" step="1" value="50" />
+					<span id="evenness-lowpass-readout" class="drum-bpm-readout">600 Hz</span>
+				</label>
+				<label class="gate-slider">
+					Mic boost
+					<input type="range" id="evenness-boost" min="0.5" max="8" step="0.1" />
+				</label>
+				<p class="gate-hint">Lower the cutoff to hide slap and pick noise on the wave.</p>
 			</div>
 		</div>
 	</section>

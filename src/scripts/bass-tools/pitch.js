@@ -5,9 +5,17 @@ const DECIMATE = 2;
 const RMS_WINDOW = 2048;
 export const INPUT_GAIN_MIN = 0.5;
 export const INPUT_GAIN_MAX = 8;
+export const LOWPASS_MIN_HZ = 80;
+export const LOWPASS_MAX_HZ = 8000;
 
 function clampInputGain(value) {
   return Math.min(INPUT_GAIN_MAX, Math.max(INPUT_GAIN_MIN, value));
+}
+
+function clampLowpassHz(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return LOWPASS_MAX_HZ;
+  return Math.min(LOWPASS_MAX_HZ, Math.max(LOWPASS_MIN_HZ, n));
 }
 
 function rms(buffer, start = 0, length = buffer.length) {
@@ -125,6 +133,7 @@ export class PitchListener {
   constructor(options = {}) {
     this.noiseGate = options.noiseGate ?? 0.015;
     this.inputGain = clampInputGain(options.inputGain ?? 3);
+    this.lowpassHz = options.lowpassHz == null ? null : clampLowpassHz(options.lowpassHz);
     this.centsTolerance = options.centsTolerance ?? 40;
     this.minFreq = options.minFreq ?? 25;
     this.maxFreq = options.maxFreq ?? 400;
@@ -133,6 +142,7 @@ export class PitchListener {
     this.stream = null;
     this.analyser = null;
     this.inputGainNode = null;
+    this.lowpassNode = null;
     this.audioContext = null;
     this.buffer = null;
     this.gated = false;
@@ -167,7 +177,16 @@ export class PitchListener {
     this.analyser.fftSize = DEFAULT_FFT;
     this.buffer = new Float32Array(this.analyser.fftSize);
     source.connect(this.inputGainNode);
-    this.inputGainNode.connect(this.analyser);
+    if (this.lowpassHz != null) {
+      this.lowpassNode = this.audioContext.createBiquadFilter();
+      this.lowpassNode.type = 'lowpass';
+      this.lowpassNode.Q.value = Math.SQRT1_2;
+      this.lowpassNode.frequency.value = this.lowpassHz;
+      this.inputGainNode.connect(this.lowpassNode);
+      this.lowpassNode.connect(this.analyser);
+    } else {
+      this.inputGainNode.connect(this.analyser);
+    }
     this._loop();
   }
 
@@ -185,6 +204,7 @@ export class PitchListener {
     }
     this.analyser = null;
     this.inputGainNode = null;
+    this.lowpassNode = null;
     this.buffer = null;
   }
 
@@ -231,6 +251,14 @@ export class PitchListener {
     this.inputGain = clampInputGain(value);
     if (this.inputGainNode && this.audioContext) {
       this.inputGainNode.gain.setValueAtTime(this.inputGain, this.audioContext.currentTime);
+    }
+  }
+
+  setLowpassHz(value) {
+    if (this.lowpassHz == null) return;
+    this.lowpassHz = clampLowpassHz(value);
+    if (this.lowpassNode && this.audioContext) {
+      this.lowpassNode.frequency.setValueAtTime(this.lowpassHz, this.audioContext.currentTime);
     }
   }
 

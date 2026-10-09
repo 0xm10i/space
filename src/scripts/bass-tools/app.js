@@ -1,6 +1,7 @@
 import { createTuner } from './tuner.js';
 import { createMetronome } from './metronome.js';
 import { createDrumMachine, DRUM_VOICES, DRUM_VOICE_LABELS } from './drumMachine.js';
+import { createEvenness } from './evenness.js';
 import { loadSettings, saveSettings, settingsToMidi } from './settings.js';
 import {
   midiToFreq,
@@ -15,12 +16,15 @@ const viewHome = document.getElementById('view-home');
 const viewTuner = document.getElementById('view-tuner');
 const viewMetronome = document.getElementById('view-metronome');
 const viewDrum = document.getElementById('view-drum');
+const viewEvenness = document.getElementById('view-evenness');
 const btnTuner = document.getElementById('btn-tuner');
 const btnMetronome = document.getElementById('btn-metronome');
 const btnDrum = document.getElementById('btn-drum');
+const btnEvenness = document.getElementById('btn-evenness');
 const btnTunerBack = document.getElementById('btn-tuner-back');
 const btnMetronomeBack = document.getElementById('btn-metronome-back');
 const btnDrumBack = document.getElementById('btn-drum-back');
+const btnEvennessBack = document.getElementById('btn-evenness-back');
 const btnMetronomePlay = document.getElementById('btn-metronome-play');
 const btnDrumPlay = document.getElementById('btn-drum-play');
 const btnDrumReset = document.getElementById('btn-drum-reset');
@@ -60,6 +64,16 @@ const drumVolMaster = document.getElementById('drum-vol-master');
 const drumVolKick = document.getElementById('drum-vol-kick');
 const drumVolSnare = document.getElementById('drum-vol-snare');
 const drumVolHihat = document.getElementById('drum-vol-hihat');
+const evennessWave = document.getElementById('evenness-wave');
+const evennessTempoSlider = document.getElementById('evenness-tempo');
+const evennessBpmReadout = document.getElementById('evenness-bpm');
+const evennessClickVolumeSlider = document.getElementById('evenness-click-volume');
+const evennessMeter = document.getElementById('evenness-meter');
+const evennessBoostSlider = document.getElementById('evenness-boost');
+const evennessLatencySlider = document.getElementById('evenness-latency');
+const evennessLatencyReadout = document.getElementById('evenness-latency-readout');
+const evennessLowpassSlider = document.getElementById('evenness-lowpass');
+const evennessLowpassReadout = document.getElementById('evenness-lowpass-readout');
 
 const METER_FULL_SCALE_RMS = 0.04;
 const BPM_MIN = 20;
@@ -79,6 +93,8 @@ setDrumVoiceVolume('hhClosed', 1);
 let activeTuner = null;
 let activeMetronome = null;
 let activeDrumMachine = null;
+let activeEvenness = null;
+let evennessBpmValue = 90;
 let metronomeBpmValue = 90;
 let metronomeBeatsValue = 4;
 let metronomeBeatsEnabledValue = true;
@@ -159,6 +175,7 @@ function showView(name) {
     tuner: viewTuner,
     metronome: viewMetronome,
     drum: viewDrum,
+    evenness: viewEvenness,
   };
   for (const [key, el] of Object.entries(map)) {
     const active = key === name;
@@ -347,6 +364,7 @@ function ensureMetronome() {
 function openMetronomeView() {
   stopTuner();
   stopDrumMachine();
+  stopEvenness();
   showView('metronome');
   syncMetronomeDialUi(metronomeBpmValue);
   syncMetronomeBeatsEnabledUi(metronomeBeatsEnabledValue);
@@ -562,6 +580,7 @@ function ensureDrumMachine() {
 function openDrumView() {
   stopTuner();
   stopMetronome();
+  stopEvenness();
   showView('drum');
   syncDrumTempoUi(drumBpmValue);
   syncDrumBeatsUi(drumBeatsValue);
@@ -680,9 +699,149 @@ function bindDrumUi() {
   });
 }
 
+function syncEvennessTempoUi(bpm) {
+  evennessBpmValue = bpm;
+  if (evennessTempoSlider) evennessTempoSlider.value = String(bpm);
+  if (evennessBpmReadout) evennessBpmReadout.textContent = `${bpm} BPM`;
+}
+
+function formatLatencyMs(ms) {
+  const rounded = Math.round(ms);
+  if (rounded > 0) return `+${rounded} ms`;
+  return `${rounded} ms`;
+}
+
+function syncEvennessLatencyUi(ms) {
+  const value = Math.min(200, Math.max(-200, Math.round(Number(ms) || 0)));
+  settings.evennessLatencyMs = value;
+  if (evennessLatencySlider) evennessLatencySlider.value = String(value);
+  if (evennessLatencyReadout) evennessLatencyReadout.textContent = formatLatencyMs(value);
+}
+
+const EVENNESS_LOWPASS_MIN_HZ = 80;
+const EVENNESS_LOWPASS_MAX_HZ = 8000;
+
+function clampEvennessLowpassHz(hz) {
+  const n = Number(hz);
+  if (!Number.isFinite(n)) return 600;
+  return Math.min(EVENNESS_LOWPASS_MAX_HZ, Math.max(EVENNESS_LOWPASS_MIN_HZ, Math.round(n)));
+}
+
+function lowpassSliderToHz(pos) {
+  const t = Math.min(100, Math.max(0, Number(pos) || 0)) / 100;
+  return clampEvennessLowpassHz(
+    EVENNESS_LOWPASS_MIN_HZ * (EVENNESS_LOWPASS_MAX_HZ / EVENNESS_LOWPASS_MIN_HZ) ** t,
+  );
+}
+
+function lowpassHzToSlider(hz) {
+  const value = clampEvennessLowpassHz(hz);
+  const t = Math.log(value / EVENNESS_LOWPASS_MIN_HZ) / Math.log(EVENNESS_LOWPASS_MAX_HZ / EVENNESS_LOWPASS_MIN_HZ);
+  return Math.round(t * 100);
+}
+
+function formatLowpassHz(hz) {
+  const value = clampEvennessLowpassHz(hz);
+  if (value >= 1000) return `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)} kHz`;
+  return `${value} Hz`;
+}
+
+function syncEvennessLowpassUi(hz) {
+  const value = clampEvennessLowpassHz(hz);
+  settings.evennessLowpassHz = value;
+  if (evennessLowpassSlider) evennessLowpassSlider.value = String(lowpassHzToSlider(value));
+  if (evennessLowpassReadout) evennessLowpassReadout.textContent = formatLowpassHz(value);
+}
+
+function updateEvennessMeter(rms) {
+  if (!evennessMeter) return;
+  evennessMeter.style.width = `${meterLevelFraction(rms) * 100}%`;
+}
+
+function stopEvenness() {
+  if (activeEvenness) {
+    activeEvenness.stop();
+    activeEvenness = null;
+  }
+  updateEvennessMeter(0);
+}
+
+async function startEvenness() {
+  stopTuner();
+  stopMetronome();
+  stopDrumMachine();
+  try {
+    showView('evenness');
+    syncEvennessTempoUi(evennessBpmValue);
+    syncEvennessLatencyUi(settings.evennessLatencyMs ?? 0);
+    syncEvennessLowpassUi(settings.evennessLowpassHz ?? 600);
+    syncMetronomeVolumeUi(evennessClickVolumeSlider);
+    syncInputGainUi(evennessBoostSlider);
+    updateEvennessMeter(0);
+    activeEvenness = createEvenness(
+      {
+        bpm: evennessBpmValue,
+        latencyMs: settings.evennessLatencyMs ?? 0,
+        lowpassHz: settings.evennessLowpassHz ?? 600,
+        inputGain: settings.inputGain,
+        inputDeviceId: settings.inputDeviceId,
+        canvas: evennessWave,
+      },
+      { onLevel: updateEvennessMeter },
+    );
+    await activeEvenness.start();
+  } catch (err) {
+    stopEvenness();
+    showView('home');
+    alert(err.message || 'Could not start evenness. Check microphone permission.');
+  }
+}
+
+function bindEvennessUi() {
+  syncEvennessTempoUi(evennessBpmValue);
+  if (evennessTempoSlider) {
+    evennessTempoSlider.addEventListener('input', () => {
+      const bpm = parseInt(evennessTempoSlider.value, 10);
+      syncEvennessTempoUi(bpm);
+      if (activeEvenness) activeEvenness.setBpm(bpm);
+    });
+  }
+  if (evennessClickVolumeSlider) {
+    evennessClickVolumeSlider.addEventListener('input', () => {
+      const value = parseFloat(evennessClickVolumeSlider.value);
+      settings.metronomeVolume = value;
+      setMetronomeVolume(value);
+    });
+    evennessClickVolumeSlider.addEventListener('change', () => {
+      saveSettings(settings);
+    });
+  }
+  syncEvennessLatencyUi(settings.evennessLatencyMs ?? 0);
+  if (evennessLatencySlider) {
+    evennessLatencySlider.addEventListener('input', () => {
+      syncEvennessLatencyUi(parseFloat(evennessLatencySlider.value));
+      if (activeEvenness) activeEvenness.setLatencyMs(settings.evennessLatencyMs);
+    });
+    evennessLatencySlider.addEventListener('change', () => {
+      saveSettings(settings);
+    });
+  }
+  syncEvennessLowpassUi(settings.evennessLowpassHz ?? 600);
+  if (evennessLowpassSlider) {
+    evennessLowpassSlider.addEventListener('input', () => {
+      syncEvennessLowpassUi(lowpassSliderToHz(evennessLowpassSlider.value));
+      if (activeEvenness) activeEvenness.setLowpassHz(settings.evennessLowpassHz);
+    });
+    evennessLowpassSlider.addEventListener('change', () => {
+      saveSettings(settings);
+    });
+  }
+}
+
 async function startTuner() {
   stopMetronome();
   stopDrumMachine();
+  stopEvenness();
   try {
     showView('tuner');
     resetTunerUi();
@@ -719,6 +878,10 @@ btnDrum.addEventListener('click', () => {
   openDrumView();
 });
 
+btnEvenness.addEventListener('click', () => {
+  void startEvenness();
+});
+
 btnTunerBack.addEventListener('click', () => {
   stopTuner();
   showView('home');
@@ -734,11 +897,20 @@ btnDrumBack.addEventListener('click', () => {
   showView('home');
 });
 
+btnEvennessBack.addEventListener('click', () => {
+  stopEvenness();
+  showView('home');
+});
+
 bindMetronomeUi();
 bindDrumUi();
+bindEvennessUi();
 bindGateSlider(tunerGateSlider, tunerGateMark, (value) => {
   if (activeTuner) activeTuner.setNoiseGate(value);
 });
 bindInputGainSlider(tunerBoostSlider, (value) => {
   if (activeTuner) activeTuner.setInputGain(value);
+});
+bindInputGainSlider(evennessBoostSlider, (value) => {
+  if (activeEvenness) activeEvenness.setInputGain(value);
 });

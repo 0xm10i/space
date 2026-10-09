@@ -14,6 +14,8 @@ export const DEFAULTS = {
   inputDeviceId: '',
   playbackVolume: 1,
   metronomeVolume: 1,
+  evennessLatencyMs: 0,
+  evennessLowpassHz: 600,
 };
 
 const STORAGE_KEY = 'bass-tools-settings';
