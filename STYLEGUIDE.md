@@ -12,27 +12,29 @@ All tokens live in `:root` inside `src/styles/global.css`. Use CSS variables; do
 
 ### Colors
 
-| Token | Light | Dark | Usage |
-|-------|-------|------|-------|
-| `--bg` | `#ffffff` | `#141414` | Page background |
-| `--bg-elevated` | `#ffffff` | `#1c1c1c` | Cards, raised surfaces |
-| `--text` | `#1a1a1a` | `#e8e6e3` | Primary body text |
-| `--text-muted` | `#5c5c5c` | `#9a9590` | Secondary text, nav links, descriptions |
-| `--accent` | `#8f2d56` | `#d66a96` | Taglines, hover accents, primary actions |
-| `--accent-hover` | `#742448` | `#e888ad` | Link hover, primary button hover |
-| `--border` | `#d8d2c8` | `#333333` | Borders, dividers |
-| `--link` | `#8f2d56` | `#d66a96` | Inline links |
+Fixed **terminal dark** palette (`color-scheme: dark` on `:root`). There is no light theme or OS-based switch.
 
-Dark mode follows `prefers-color-scheme: dark`. Do not add a manual theme toggle unless the whole site adopts one.
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--bg` | `#0a1610` | Page background |
+| `--bg-elevated` | `#0f1f17` | Cards, raised surfaces |
+| `--text` | `#ffffff` | Primary body text |
+| `--text-muted` | `#8fa396` | Secondary text, nav links, descriptions |
+| `--accent` | `#1fb769` | Taglines, hover accents, primary actions |
+| `--accent-hover` | `#24ff8f` | Link hover, primary button hover |
+| `--border` | `#1e3026` | Borders, dividers |
+| `--link` | `#1fb769` | Inline links |
+
+Primary buttons (`.btn-primary`) use `--accent` background with `#0a1610` text; hover uses `--accent-hover`.
 
 ### Typography
 
 | Token | Value |
 |-------|-------|
-| `--font-sans` | `'Space Grotesk', system-ui, sans-serif` |
-| `--font-mono` | `'IBM Plex Mono', ui-monospace, monospace` |
+| `--font-sans` | `'3270 Nerd Font Mono', ui-monospace, monospace` |
+| `--font-mono` | `'3270 Nerd Font Mono', ui-monospace, monospace` |
 
-Fonts are loaded in `Layout.astro` (weights 400, 500, 600 for Space Grotesk; 400, 500 for IBM Plex Mono).
+Self-hosted **3270 Nerd Font Mono Regular** (`public/fonts/3270-regular.ttf`). Source variants (Condensed, SemiCondensed, etc.) live in [`fonts/3270/`](fonts/3270/) for reference only.
 
 **Base:** `html` uses `--font-sans`, `line-height: 1.6`, `--text` on `--bg`.
 
@@ -371,7 +373,7 @@ Priority when refactoring Talk Back:
 - [ ] Cards match `.tool-card` border, radius, and padding
 - [ ] Links follow inline vs nav vs card rules above
 - [ ] Buttons use `.btn-primary` / `.btn-secondary` spec (6px radius)
-- [ ] Dark mode works via existing CSS variables only
+- [ ] Terminal dark palette uses CSS variables only (fixed `:root` tokens)
 
 ---
 

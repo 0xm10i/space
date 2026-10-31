@@ -31,7 +31,7 @@ main .settings-panel h2 {
 
 main .home-start-label {
 	margin: 0 0 0.35rem;
-	font-size: 0.9rem;
+	font-size: var(--text-xs);
 	color: var(--text-muted);
 }
 
@@ -81,7 +81,7 @@ main label {
 	display: flex;
 	flex-direction: column;
 	gap: 0.35rem;
-	font-size: 0.9rem;
+	font-size: var(--text-xs);
 	color: var(--text-muted);
 }
 
@@ -108,7 +108,7 @@ main .advanced {
 
 main .hint {
 	color: var(--success);
-	font-size: 0.9rem;
+	font-size: var(--text-xs);
 }
 
 main .progress-row {
@@ -116,7 +116,7 @@ main .progress-row {
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 1rem;
-	font-size: 1.1rem;
+	font-size: var(--text-base);
 }
 
 main .practice-status {
@@ -126,7 +126,7 @@ main .practice-status {
 }
 
 main .practice-hint {
-	font-size: 2.5rem;
+	font-size: var(--text-xl);
 	line-height: 1;
 	margin: 0.25rem 0;
 	display: flex;
@@ -156,12 +156,12 @@ main .practice-hint .hint-correct {
 main .practice-hint .hint-reveal {
 	color: var(--success);
 	font-size: 2rem;
-	line-height: 1.25;
+	line-height: 1;
 }
 
 main .practice-sequence {
 	color: var(--text-muted);
-	font-size: 0.95rem;
+	font-size: var(--text-base);
 	margin: 0 0 0.25rem;
 }
 
@@ -176,7 +176,7 @@ main .meter-wrap {
 }
 
 main .meter-label {
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	margin-bottom: 0.35rem;
 	color: var(--text-muted);
 }
@@ -219,7 +219,7 @@ main .gate-slider {
 	justify-content: space-between;
 	gap: 0.75rem;
 	margin-top: 0.65rem;
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 }
 
 main .gate-slider input[type='range'] {
@@ -233,7 +233,7 @@ main .gate-slider input[type='range'] {
 
 main .gate-hint {
 	margin: 0.35rem 0 0;
-	font-size: 0.8rem;
+	font-size: var(--text-xs);
 	color: var(--text-muted);
 }
 
@@ -249,9 +249,9 @@ main .note-range-field .gate-slider {
 
 main .note-range-preview {
 	margin: 0;
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	color: var(--text-muted);
-	line-height: 1.35;
+	line-height: 1;
 }
 
 main .practice-volume {
@@ -432,12 +432,12 @@ main .stats-grid {
 
 main .stats-grid dt {
 	color: var(--text-muted);
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 }
 
 main .stats-grid dd {
 	margin: 0;
-	font-size: 1.25rem;
+	font-size: var(--text-lg);
 	font-weight: 600;
 }
 
@@ -452,7 +452,7 @@ main .per-note-list li {
 	justify-content: space-between;
 	padding: 0.4rem 0;
 	border-bottom: 1px solid var(--border);
-	font-size: 0.95rem;
+	font-size: var(--text-base);
 }
 
 main .per-note-list .wrong {
@@ -468,7 +468,7 @@ main :where(.tuner-title, .metronome-title, .drum-title) {
 }
 
 main .tuner-note {
-	font-size: 2.75rem;
+	font-size: var(--text-xl);
 	font-weight: 600;
 	text-align: center;
 	margin: 0.5rem 0 0.25rem;
@@ -481,7 +481,7 @@ main .tuner-card.in-tune .tuner-note {
 
 main .tuner-cents {
 	text-align: center;
-	font-size: 1.25rem;
+	font-size: var(--text-lg);
 	margin: 0 0 0.25rem;
 	min-height: 1.5rem;
 }
@@ -553,7 +553,7 @@ main .tempo-dial-wrap {
 }
 
 main .tempo-dial-label {
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	color: var(--text-muted);
 }
 
@@ -605,7 +605,7 @@ main .tempo-dial-value {
 	top: 42%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	font-size: 1.75rem;
+	font-size: var(--text-xl);
 	font-weight: 700;
 	letter-spacing: -0.03em;
 	pointer-events: none;
@@ -648,13 +648,13 @@ main .stepper-field {
 }
 
 main .stepper-label {
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	color: var(--text-muted);
 }
 
 main .stepper-label-row {
 	justify-content: center;
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	color: var(--text-muted);
 }
 
@@ -677,7 +677,7 @@ main .stepper-btn {
 main .stepper-input {
 	width: 3rem;
 	text-align: center;
-	font-size: 1.1rem;
+	font-size: var(--text-base);
 	font-weight: 600;
 	padding: 0.35rem 0.25rem;
 	border: 1px solid var(--border);
@@ -746,7 +746,7 @@ main .drum-vol-slider {
 }
 
 main .drum-vol-mark {
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	font-weight: 600;
 	color: var(--text);
 	letter-spacing: 0.02em;
@@ -759,7 +759,7 @@ main .drum-vol-slider input[type='range'] {
 main .drum-bpm-readout {
 	display: block;
 	text-align: center;
-	font-size: 0.95rem;
+	font-size: var(--text-base);
 	font-weight: 600;
 	margin-top: 0.35rem;
 }
@@ -801,7 +801,7 @@ main .drum-row-label {
 	color: var(--text-muted);
 	text-align: right;
 	padding-right: 0.25rem;
-	line-height: 1.2;
+	line-height: 1;
 }
 
 main .drum-steps {
@@ -849,7 +849,7 @@ main .evenness-title {
 
 main .evenness-lead {
 	margin: 0.35rem 0 0.85rem;
-	font-size: 0.9rem;
+	font-size: var(--text-xs);
 	color: var(--text-muted);
 }
 
@@ -875,7 +875,7 @@ main .evenness-legend {
 	justify-content: flex-end;
 	gap: 0.85rem;
 	margin-top: 0.4rem;
-	font-size: 0.8rem;
+	font-size: var(--text-xs);
 }
 
 main .evenness-legend-odd {

@@ -27,12 +27,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap"
-			rel="stylesheet"
-		/>
+		<link rel="preload" href="/fonts/3270-regular.ttf" as="font" type="font/ttf" crossorigin />
 		<title>{pageTitle}</title>
 	</head>
 	<body>
