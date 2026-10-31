@@ -13,7 +13,7 @@
 	--font-sans: '3270 Nerd Font Mono', ui-monospace, monospace;
 	--font-mono: '3270 Nerd Font Mono', ui-monospace, monospace;
 	--max-width: 42rem;
-	--space: 1.25rem;
+	--space: 1rem;
 	--radius: 0;
 	--text-xs: 0.75rem;
 	--text-base: 1rem;
@@ -63,7 +63,7 @@ img {
 .site-header__inner {
 	max-width: calc(var(--max-width) + 2 * var(--space));
 	margin: 0 auto;
-	padding: var(--space);
+	padding: 1rem;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -109,13 +109,13 @@ img {
 main {
 	max-width: calc(var(--max-width) + 2 * var(--space));
 	margin: 0 auto;
-	padding: 2rem var(--space) 3rem;
+	padding: 1rem;
 }
 
 .site-footer {
 	max-width: calc(var(--max-width) + 2 * var(--space));
 	margin: 0 auto;
-	padding: var(--space);
+	padding: 1rem;
 	font-size: var(--text-xs);
 	color: var(--text-muted);
 }
@@ -123,7 +123,7 @@ main {
 .hero h1 {
 	font-size: var(--text-xl);
 	font-weight: 600;
-	margin: 0 0 0.5rem;
+	margin: 0 0 1rem;
 }
 
 .site-title__text,
@@ -200,7 +200,7 @@ main {
 
 .hero .bio {
 	color: var(--text-muted);
-	margin: 0 0 1.25rem;
+	margin: 0 0 1rem;
 	max-width: 36rem;
 }
 
@@ -217,7 +217,7 @@ main {
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
 	color: var(--text-muted);
-	margin: 2.5rem 0 1rem;
+	margin: 1rem 0 1rem;
 }
 
 .tool-grid {
@@ -228,25 +228,133 @@ main {
 	gap: 0.75rem;
 }
 
+@keyframes tool-card-neon-on {
+	0% {
+		border-color: var(--border);
+		background: var(--bg-elevated);
+	}
+
+	8% {
+		border-color: var(--accent);
+		background: color-mix(in srgb, var(--accent) 32%, #000);
+	}
+
+	16% {
+		border-color: var(--border);
+		background: var(--bg-elevated);
+	}
+
+	24% {
+		border-color: var(--accent);
+		background: color-mix(in srgb, var(--accent) 20%, #000);
+	}
+
+	32% {
+		border-color: var(--border);
+		background: #000;
+	}
+
+	42% {
+		border-color: var(--accent);
+		background: color-mix(in srgb, var(--accent) 26%, #000);
+	}
+
+	54% {
+		border-color: var(--border);
+		background: var(--bg-elevated);
+	}
+
+	100% {
+		border-color: var(--accent);
+		background: color-mix(in srgb, var(--accent) 14%, #000);
+	}
+}
+
+@keyframes tool-card-neon-text {
+	0%,
+	16%,
+	32%,
+	54% {
+		opacity: 1;
+	}
+
+	8%,
+	24%,
+	42% {
+		opacity: 0.15;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes tool-card-desc-neon {
+	0%,
+	12%,
+	24%,
+	40% {
+		color: var(--text-muted);
+	}
+
+	6%,
+	18%,
+	32% {
+		color: var(--accent);
+		opacity: 0.25;
+	}
+
+	52% {
+		color: var(--accent);
+		opacity: 0.7;
+	}
+
+	100% {
+		color: var(--accent);
+		opacity: 1;
+	}
+}
+
 .tool-card {
 	display: block;
-	padding: 1rem 1.15rem;
+	padding: 1rem;
 	background: var(--bg-elevated);
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
+	border-top-right-radius: 2rem;
+	corner-shape: bevel;
 	text-decoration: none;
 	color: inherit;
-	transition: border-color 0.15s, box-shadow 0.15s;
+	font-size: 2rem;
+	text-transform: uppercase;
+	transition:
+		border-color 0.15s,
+		background 0.15s;
 }
 
+.tool-grid li:hover .tool-card,
 .tool-card:hover {
-	border-color: var(--accent);
-	box-shadow: 0 2px 12px rgba(31, 183, 105, 0.15);
+	animation: tool-card-neon-on 200ms steps(1, end) forwards;
+	transition: none;
+}
+
+.tool-grid li:hover .tool-card :where(.tool-card__title, .tool-card__desc),
+.tool-card:hover :where(.tool-card__title, .tool-card__desc) {
+	animation: tool-card-neon-text 200ms steps(1, end) forwards;
+}
+
+.tool-grid li:hover .tool-card .tool-card__desc,
+.tool-card:hover .tool-card__desc {
+	animation:
+		tool-card-neon-text 200ms steps(1, end) forwards,
+		tool-card-desc-neon 200ms steps(1, end) forwards;
 }
 
 .tool-card__title {
 	font-weight: 600;
-	margin: 0 0 0.25rem;
+	margin: 0 0 1rem;
+	font-size: 2rem;
+	text-transform: uppercase;
 }
 
 .tool-card__desc {
@@ -259,7 +367,7 @@ main {
 	font-family: var(--font-mono);
 	font-size: var(--text-xs);
 	color: var(--text-muted);
-	margin-top: 0.5rem;
+	margin-top: 1rem;
 }
 
 .post-list {
@@ -269,7 +377,7 @@ main {
 }
 
 .post-list li {
-	padding: 0.75rem 0;
+	padding: 1rem 0;
 	border-bottom: 1px solid var(--border);
 }
 
@@ -295,7 +403,7 @@ main {
 }
 
 .prose :where(h2, h3) {
-	margin-top: 2rem;
+	margin-top: 1rem;
 }
 
 .empty-state {
@@ -306,18 +414,18 @@ main {
 .page-intro h1 {
 	font-size: var(--text-xl);
 	font-weight: 600;
-	margin: 0 0 0.5rem;
+	margin: 0 0 1rem;
 }
 
 .page-intro__desc {
 	color: var(--text-muted);
 	font-size: var(--text-xs);
-	margin: 0 0 1.25rem;
+	margin: 0 0 1rem;
 	max-width: 36rem;
 }
 
 .card {
-	padding: 1rem 1.15rem;
+	padding: 1rem;
 	background: var(--bg-elevated);
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
@@ -325,7 +433,7 @@ main {
 
 .card__title {
 	font-weight: 600;
-	margin: 0 0 0.25rem;
+	margin: 0 0 1rem;
 }
 
 button,
@@ -342,11 +450,11 @@ textarea {
 	gap: 0.5rem;
 	border: none;
 	border-radius: var(--radius);
-	padding: 0.65rem 1.1rem;
+	padding: 1rem;
 	font-size: var(--text-base);
 	cursor: pointer;
-	margin-right: 0.5rem;
-	margin-top: 0.5rem;
+	margin-right: 1rem;
+	margin-top: 1rem;
 	transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
@@ -377,7 +485,7 @@ textarea {
 }
 
 .btn-small {
-	padding: 0.35rem 0.75rem;
+	padding: 1rem;
 	font-size: var(--text-xs);
 }
 
